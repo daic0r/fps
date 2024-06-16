@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../math/matrix.h"
+#include <numbers>
 
 TEST(MatrixTests, MatrixMultiplication) {
    using namespace fps::math;
@@ -26,4 +27,18 @@ TEST(MatrixTests, MatrixMultiplication) {
    };
    EXPECT_EQ(result, expected);
 
+}
+
+TEST(MatrixTests, PerspectiveMatrix) {
+   using namespace fps::math;
+
+   auto m = matrix::perspective(std::numbers::pi_v<float> / 4.0f, 4.0f/3.0f, 0.1f, 100.0f);
+
+   matrix expected = {
+      2.41421f, 0.0f, 0.0f, 0.0f,
+      0.0f, 3.29656f, 0.0f, 0.0f,
+      0.0f, 0.0f, 1.002f, -0.2002f,
+      0.0f, 0.0f, 1.0f, 0.0f
+   };
+   EXPECT_EQ(m, expected);
 }

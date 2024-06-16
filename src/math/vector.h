@@ -4,14 +4,25 @@
 #include <cmath>
 
 namespace fps::math {
-   struct vector {
-      float x, y, z, w;
+   struct vertex {
+      float x{}, y{}, z{}, w{ 1.0f };
 
-      constexpr vector() : x{}, y{}, z{}, w{} {}
+      constexpr vertex operator*(float scalar) const noexcept {
+         return vertex{ x * scalar, y * scalar, z * scalar };
+      }
+      constexpr vertex operator/(float scalar) const noexcept {
+         return vertex{ x / scalar, y / scalar, z / scalar };
+      }
+   };
 
-      constexpr vector(float x, float y, float z, float w = 0.0f) : x{x}, y{y}, z{z}, w{w} {}
+   struct vector : vertex {
+      friend class matrix;
 
-      constexpr float length() const {
+      constexpr vector() = default;
+
+      constexpr vector(float x, float y, float z, float w = 0.0f) : vertex{ x, y, z, w } {}
+
+      constexpr float length() const noexcept {
          return std::sqrt(x * x + y * y + z * z);
       }
 
@@ -28,6 +39,13 @@ namespace fps::math {
          return vector{ y * rhs.z - z * rhs.y,
                         z * rhs.x - x * rhs.z,
                         x * rhs.y - y * rhs.x };
+      }
+
+      constexpr vector operator+(vector const& rhs) const noexcept {
+         return vector{ x + rhs.x, y + rhs.y, z + rhs.z };
+      }
+      constexpr vector operator-(vector const& rhs) const noexcept {
+         return vector{ x - rhs.x, y - rhs.y, z - rhs.z };
       }
    };
 }

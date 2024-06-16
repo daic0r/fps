@@ -3,6 +3,7 @@
 
 #include <array>
 #include "vector.h"
+#include "utils.h"
 
 namespace fps::math {
    class matrix {
@@ -30,7 +31,7 @@ namespace fps::math {
       }
 
 
-      constexpr vector operator*(const vector& v) const {
+      constexpr vertex operator*(const vertex& v) const {
          return vector{
             m_data[0][0] * v.x + m_data[0][1] * v.y + m_data[0][2] * v.z + m_data[0][3] * v.w,
             m_data[1][0] * v.x + m_data[1][1] * v.y + m_data[1][2] * v.z + m_data[1][3] * v.w,
@@ -50,16 +51,38 @@ namespace fps::math {
       }
 
       static constexpr matrix perspective(float fovH, float fAspectRatio, float fNear, float fFar) {
+         const auto fov2 = fovH * 0.5f;
+         const auto denom = fNear - fFar;
          matrix ret{};
-         ret[0,0] = 1.0f / tanf(fovH * 0.5f);
-         ret[1,1] = 1.0f / tanf((1.0f / fAspectRatio) * fovH * 0.5f);
-         ret[2,2] = -(fNear + fFar) / (fNear - fFar);
-         ret[2,3] = (2.0f * fNear * fFar) / (fNear - fFar);
-         ret[3,2] = 1.0f;
+         ret[0,0] = 1.0f / tanf(fov2);
+         ret[1,1] = 1.0f / tanf((1.0f / fAspectRatio) * fov2);
+         ret[2,2] = -(fNear + fFar) / denom;
+         ret[2,3] = (2.0f * fNear * fFar) / denom;
+         ret[3,2] = -1.0f;
+         return ret;
+      }
+      static constexpr matrix viewport(int x, int y, int width, int height) {
+         matrix ret{};
+         const auto w2 = 0.5f * width;
+         const auto h2 = 0.5f * height;
+         ret[0,0] = w2;
+         ret[0,3] = x + w2;
+         ret[1,1] = -h2;
+         ret[1,3] = h2 + y;
          return ret;
       }
 
-      auto operator<=>(const matrix&) const = default;
+      constexpr bool operator==(const matrix& other) const {
+         for (std::size_t i = 0; i < 4; ++i) {
+            for (std::size_t j = 0; j < 4; ++j) {
+               if (not fps::math::test_equal(m_data[i][j], other[i,j], .00001f)) {
+                  return false;
+               }
+            }
+         }
+         return true;
+      }
+
    };
 }
 

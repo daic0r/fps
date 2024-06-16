@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
    
 add_subdirectory(src)
 
+target_link_libraries(FPS PRIVATE raylib)
+
 include(FetchContent)
 FetchContent_Declare(
    googletest
