@@ -48,6 +48,10 @@ namespace fps::math {
          return vector{ x - rhs.x, y - rhs.y, z - rhs.z };
       }
    };
+
+   struct coord2d {
+      float x, y;
+   };
 }
 
 #endif
