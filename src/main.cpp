@@ -1,10 +1,13 @@
 #include "math/matrix.h"
+#include <cstring>
 #include <iostream>
 #include <numbers>
 #include <raylib.h>
 #include <array>
 #include <cmath>
 #include "rendering/utils.h"
+#include <chrono>
+#include <format>
 
 using namespace fps::math;
 
@@ -44,6 +47,10 @@ int main() {
    }
 
    Image img = GenImageColor(width, height, BLACK);
+   ImageFormat(&img, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+   auto tex = LoadTextureFromImage(img);
+   fps::rendering::renderbuffer screen{ width, height };
+   std::memset(screen.buffer(), 0, 800*600*4);
 
    auto p1 = persp * triangle[0];
    auto p2 = persp * triangle[1];
@@ -64,9 +71,10 @@ int main() {
    std::cout << "P3: " << p3.x << ", " << p3.y << ", " << p3.z << ", " << p3.w << '\n';
 
          
+   int avg_time = 0;
    while (!WindowShouldClose()) {
       BeginDrawing();
-         ClearBackground(BLACK);
+         //ClearBackground(BLACK);
 
 
          //DrawTriangle(Vector2{ p1.x, p1.y }, Vector2{ p2.x, p2.y }, Vector2{ p3.x, p3.y }, RED);
@@ -74,12 +82,22 @@ int main() {
          // fps::rendering::draw_line(p1.x, p1.y, p2.x, p2.y, RED);
          // fps::rendering::draw_line(p2.x, p2.y, p3.x, p3.y, RED);
          // fps::rendering::draw_line(p3.x, p3.y, p1.x, p1.y, RED);
-         fps::rendering::draw_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, RED);
+         auto start = std::chrono::steady_clock::now();
+         fps::rendering::draw_triangle(screen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, RED);
+         auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+         avg_time += dur.count();
+         if (avg_time > 0)
+            avg_time /= 2;
+         UpdateTexture(tex, screen.buffer());
+         DrawTexture(tex, 0, 0, WHITE);
          //fps::rendering::draw_triangle(400, 600, 300, 500, 500, 300, GREEN);
       EndDrawing();
    }
 
+   UnloadTexture(tex);
    CloseWindow();
+
+   std::cout << "Triangle drawing took on average " << avg_time << "ns" << std::endl;
 
    return 0;
 }
