@@ -4,34 +4,32 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstring>
 
 namespace fps::rendering {
 
-void draw_pixel(renderbuffer& rb, int x, int y, Color col) {
-  if (x < 0 || x >= rb.width() || y < 0 || y >= rb.height())
-    return;
-
+void draw_pixel(renderbuffer& rb, int x, int y, Color const& col) {
   auto const offset = (x + y * rb.width()) * 4;
-  rb.buffer()[offset] = col.r;
-  rb.buffer()[offset + 1] = col.g;
-  rb.buffer()[offset + 2] = col.b;
-  rb.buffer()[offset + 3] = col.a;
+  std::memcpy(rb.buffer() + offset, &col, sizeof(Color));
 }
 
-void draw_line(renderbuffer& rb, float x1, float y1, float x2, float y2, Color col) {
+void draw_line(renderbuffer& rb, int x1, int y1, int x2, int y2, Color const& col) {
   using namespace fps::math;
 
-  float inc_x = sgn(x2 - x1);
-  float dy = (y2 - y1) / std::fabs(x2 - x1);
-  for (float x = std::round(x1), y = std::round(y1);
-       not test_equal(x, std::round(x2)); x += inc_x) {
-    draw_pixel(rb, (int)x, (int)y, col);
-    y += dy;
+  int* pGoverning = abs(x2 - x1) >= abs(y2 - y1) ? &x1 : &y1;
+  int inc = pGoverning == &x1 ? sgn(x2 - x1) : sgn(y2 - y1);
+  int secondary = pGoverning == &x1 ? y1 : x1;
+  int delta = pGoverning == &x1 ? (x2 - x1) / abs(y2 - y1) : (y2 - y1) / abs(x2 - x1);
+  for (int tmp = *pGoverning, limit = pGoverning == &x1 ? x2 : y2; tmp != limit;
+       tmp += inc) {
+    draw_pixel(rb, pGoverning == &x1 ? tmp : secondary,
+               pGoverning == &x1 ? secondary : tmp, col);
+    secondary += delta;
   }
 }
 
-void draw_triangle(renderbuffer& rb, float x1, float y1, float x2, float y2, float x3,
-                   float y3, Color col, bool bFill /* = true*/) {
+void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
+                   int y3, Color col, bool bFill /* = true*/) {
   // draw_line(rb, x1, y1, x2, y2, col);
   // draw_line(rb, x2, y2, x3, y3, col);
   // draw_line(rb, x1, y1, x3, y3, col);
@@ -41,9 +39,9 @@ void draw_triangle(renderbuffer& rb, float x1, float y1, float x2, float y2, flo
 
   using namespace math;
   auto corners =
-      std::array<math::coord2d, 3>{coord2d{std::round(x1), std::round(y1)},
-                                   coord2d{std::round(x2), std::round(y2)},
-                                   coord2d{std::round(x3), std::round(y3)}};
+      std::array<math::coord2d, 3>{coord2d{x1, y1},
+                                   coord2d{x2, y2},
+                                   coord2d{x3, y3}};
   std::ranges::sort(
       corners, [](coord2d const &a, coord2d const &b) { return a.y < b.y; });
 
@@ -84,28 +82,28 @@ void draw_triangle(renderbuffer& rb, float x1, float y1, float x2, float y2, flo
   //    }
   // }
 
-  auto const draw_half = [col, &rb](coord2d const &from1, coord2d const &from2,
-                                    coord2d const &to1, coord2d const &to2) {
-    auto dy1 = (to1.y - from1.y) / std::fabs(to1.x - from1.x);
-    auto dy2 = (to2.y - from2.y) / std::fabs(to2.x - from2.x);
-    for (float y = std::max(from1.y, from2.y); y < std::min(to1.y, to2.y);
-         y += 1.0f) {
-      auto base1 = (y - from1.y) / dy1;
-      auto base2 = (y - from2.y) / dy2;
+  auto const draw_half = [](renderbuffer& rb, coord2d const &from1, coord2d const &from2,
+                                    coord2d const &to1, coord2d const &to2, Color const &col) {
+    auto dy1 = ((float)(to1.y - from1.y)) / abs(to1.x - from1.x);
+    auto dy2 = ((float)(to2.y - from2.y)) / abs(to2.x - from2.x);
+    for (int y = std::max(from1.y, from2.y); y < std::min(to1.y, to2.y);
+         ++y) {
+      auto base1 = (int) std::round((y - from1.y) / dy1);
+      auto base2 = (int) std::round((y - from2.y) / dy2);
       if (to1.x < from1.x)
-        base1 *= -1.0f;
+        base1 *= -1;
       if (to2.x < from2.x)
-        base2 *= -1.0f;
+        base2 *= -1;
       auto x1 = base1 + from1.x;
       auto x2 = base2 + from2.x;
       if (x2 < x1)
         std::swap(x1, x2);
-      for (auto x = x1 + 1; x < x2; x += 1.0f) {
-        draw_pixel(rb, (int)x, (int)y, col);
+      for (auto x = x1 + 1; x < x2; ++x) {
+         draw_pixel(rb, x, y, col);
       }
     }
   };
-  draw_half(corners[0], corners[0], corners[1], corners[2]);
-  draw_half(corners[1], corners[0], corners[2], corners[2]);
+  draw_half(rb, corners[0], corners[0], corners[1], corners[2], col);
+  draw_half(rb, corners[1], corners[0], corners[2], corners[2], col);
 }
 } // namespace fps::rendering

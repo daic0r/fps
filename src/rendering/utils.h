@@ -5,9 +5,9 @@
 #include "renderbuffer.h"
 
 namespace fps::rendering {
-   void draw_pixel(renderbuffer& rb, int x, int y, Color col);
-   void draw_line(renderbuffer& rb, float x1, float y1, float x2, float y2, Color col);
-   void draw_triangle(renderbuffer& rb, float x1, float y1, float x2, float y2, float x3, float y3, Color col, bool bFill = true);
+   void draw_pixel(renderbuffer& rb, int x, int y, Color const& col);
+   void draw_line(renderbuffer& rb, int x1, int y1, int x2, int y2, Color const& col);
+   void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3, int y3, Color col, bool bFill = true);
 }
 
 #endif // GRAPHICS_UTILS_H

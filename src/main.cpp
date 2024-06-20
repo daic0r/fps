@@ -70,6 +70,15 @@ int main() {
    std::cout << "P2: " << p2.x << ", " << p2.y << ", " << p2.z << ", " << p2.w << '\n';
    std::cout << "P3: " << p3.x << ", " << p3.y << ", " << p3.z << ", " << p3.w << '\n';
 
+   std::cout << std::endl;
+   auto bres = fps::math::make_bresenham_interpolator(0, 0, 8, -4);
+   auto ret = bres();
+   while (ret) {
+      std::cout << "(" << ret->first << ", " << ret->second << ")\n";
+      ret = bres();
+   }
+
+
          
    int avg_time = 0;
    while (!WindowShouldClose()) {
@@ -79,15 +88,16 @@ int main() {
 
          //DrawTriangle(Vector2{ p1.x, p1.y }, Vector2{ p2.x, p2.y }, Vector2{ p3.x, p3.y }, RED);
          //draw_triangle(p1, p2, p3);
-         // fps::rendering::draw_line(p1.x, p1.y, p2.x, p2.y, RED);
-         // fps::rendering::draw_line(p2.x, p2.y, p3.x, p3.y, RED);
-         // fps::rendering::draw_line(p3.x, p3.y, p1.x, p1.y, RED);
-         auto start = std::chrono::steady_clock::now();
-         fps::rendering::draw_triangle(screen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, RED);
-         auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-         avg_time += dur.count();
-         if (avg_time > 0)
-            avg_time /= 2;
+         fps::rendering::draw_line(screen, p1.x, p1.y, p2.x, p2.y, RED);
+         //fps::rendering::draw_line(screen, p2.x, p2.y, p3.x, p3.y, RED);
+         //fps::rendering::draw_line(screen, p3.x, p3.y, p1.x, p1.y, RED);
+
+         // auto start = std::chrono::steady_clock::now();
+         // fps::rendering::draw_triangle(screen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, RED);
+         // auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
+         // avg_time += dur.count();
+         // if (avg_time > 0)
+         //    avg_time /= 2;
          UpdateTexture(tex, screen.buffer());
          DrawTexture(tex, 0, 0, WHITE);
          //fps::rendering::draw_triangle(400, 600, 300, 500, 500, 300, GREEN);

@@ -50,7 +50,7 @@ namespace fps::math {
    };
 
    struct coord2d {
-      float x, y;
+      int x, y;
    };
 }
 
