@@ -31,12 +31,12 @@ namespace fps::math {
       }
 
 
-      constexpr vertex operator*(const vertex& v) const {
-         return vector{
-            m_data[0][0] * v.x + m_data[0][1] * v.y + m_data[0][2] * v.z + m_data[0][3] * v.w,
-            m_data[1][0] * v.x + m_data[1][1] * v.y + m_data[1][2] * v.z + m_data[1][3] * v.w,
-            m_data[2][0] * v.x + m_data[2][1] * v.y + m_data[2][2] * v.z + m_data[2][3] * v.w,
-            m_data[3][0] * v.x + m_data[3][1] * v.y + m_data[3][2] * v.z + m_data[3][3] * v.w
+      constexpr vec4 operator*(const vec4& v) const {
+         return vec4{
+            m_data[0][0] * v[0] + m_data[0][1] * v[1] + m_data[0][2] * v[2] + m_data[0][3] * v[3],
+            m_data[1][0] * v[0] + m_data[1][1] * v[1] + m_data[1][2] * v[2] + m_data[1][3] * v[3],
+            m_data[2][0] * v[0] + m_data[2][1] * v[1] + m_data[2][2] * v[2] + m_data[2][3] * v[3],
+            m_data[3][0] * v[0] + m_data[3][1] * v[1] + m_data[3][2] * v[2] + m_data[3][3] * v[3]
          };
       }
 

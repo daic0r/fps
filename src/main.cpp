@@ -11,21 +11,11 @@
 
 using namespace fps::math;
 
-const std::array<fps::math::vertex, 3> triangle = {
-   fps::math::vertex{ 0.0f, 10.5f, -40.0f },
-   fps::math::vertex{ -10.5f, -10.5f, -40.0f },
-   fps::math::vertex{ 10.5f, -10.5f, -40.0f },
+const std::array<fps::math::vec4, 3> triangle = {
+   fps::math::vec4{ 0.0f, 10.5f, -40.0f, 1.0f },
+   fps::math::vec4{ -10.5f, 0.5f, -40.0f, 1.0f },
+   fps::math::vec4{ 10.5f, -10.5f, -40.0f, 1.0f },
 };
-
-void draw_triangle(const vertex& v1, const vertex& v2, const vertex& v3) {
-   float dy = (v2.y - v1.y) / std::fabs(v2.x - v1.x);
-   int add_or_sun = v2.x - v1.x >= 0.0f ? 1 : -1;
-   float y = v1.y;
-   for (int x = v1.x; x != v2.x; x += add_or_sun) {
-      DrawPixel(x, y, RED);
-      y += dy;
-   }
-}
 
 int main() {
 
@@ -55,20 +45,20 @@ int main() {
    auto p1 = persp * triangle[0];
    auto p2 = persp * triangle[1];
    auto p3 = persp * triangle[2];
-   p1 = p1 / p1.w;
-   p2 = p2 / p2.w;
-   p3 = p3 / p3.w;
+   p1 = p1 / p1[3];
+   p2 = p2 / p2[3];
+   p3 = p3 / p3[3];
    std::cout << "Triangle vertices:\n";
-   std::cout << "P1: " << p1.x << ", " << p1.y << ", " << p1.z << ", " << p1.w << '\n';
-   std::cout << "P2: " << p2.x << ", " << p2.y << ", " << p2.z << ", " << p2.w << '\n';
-   std::cout << "P3: " << p3.x << ", " << p3.y << ", " << p3.z << ", " << p3.w << '\n';
+   std::cout << "P1: " << p1[0] << ", " << p1[1] << ", " << p1[2] << ", " << p1[3] << '\n';
+   std::cout << "P2: " << p2[0] << ", " << p2[1] << ", " << p2[2] << ", " << p2[3] << '\n';
+   std::cout << "P3: " << p3[0] << ", " << p3[1] << ", " << p3[2] << ", " << p3[3] << '\n';
    p1 = viewp * p1;
    p2 = viewp * p2;
    p3 = viewp * p3;
    std::cout << "Triangle vertices:\n";
-   std::cout << "P1: " << p1.x << ", " << p1.y << ", " << p1.z << ", " << p1.w << '\n';
-   std::cout << "P2: " << p2.x << ", " << p2.y << ", " << p2.z << ", " << p2.w << '\n';
-   std::cout << "P3: " << p3.x << ", " << p3.y << ", " << p3.z << ", " << p3.w << '\n';
+   std::cout << "P1: " << p1[0] << ", " << p1[1] << ", " << p1[2] << ", " << p1[3] << '\n';
+   std::cout << "P2: " << p2[0] << ", " << p2[1] << ", " << p2[2] << ", " << p2[3] << '\n';
+   std::cout << "P3: " << p3[0] << ", " << p3[1] << ", " << p3[2] << ", " << p3[3] << '\n';
 
    std::cout << std::endl;
    auto bres = fps::math::make_bresenham_interpolator(9, 9, 16, 13);
@@ -86,14 +76,14 @@ int main() {
          //ClearBackground(BLACK);
 
 
-         //DrawTriangle(Vector2{ p1.x, p1.y }, Vector2{ p2.x, p2.y }, Vector2{ p3.x, p3.y }, RED);
+         //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
          //draw_triangle(p1, p2, p3);
          auto start = std::chrono::steady_clock::now();
-         // fps::rendering::draw_line(screen, p1.x, p1.y, p2.x, p2.y, RED);
-         // fps::rendering::draw_line(screen, p2.x, p2.y, p3.x, p3.y, RED);
-         // fps::rendering::draw_line(screen, p3.x, p3.y, p1.x, p1.y, RED);
+         // fps::rendering::draw_line(screen, p1[0], p1[1], p2[0], p2[1], RED);
+         // fps::rendering::draw_line(screen, p2[0], p2[1], p3[0], p3[1], RED);
+         // fps::rendering::draw_line(screen, p3[0], p3[1], p1[0], p1[1], RED);
 
-         fps::rendering::draw_triangle(screen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, RED);
+         fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, GREEN, BLUE);
          auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
          avg_time += dur.count();
          if (avg_time > 0)

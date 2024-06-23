@@ -123,7 +123,7 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
         final_col.r = static_cast<unsigned char>(col1.r * u + col2.r * v + col3.r * w);
         final_col.g = static_cast<unsigned char>(col1.g * u + col2.g * v + col3.g * w);
         final_col.b = static_cast<unsigned char>(col1.b * u + col2.b * v + col3.b * w);
-        final_col.a = 255;
+        final_col.a = static_cast<unsigned char>(col1.a * u + col2.a * v + col3.a * w);
         draw_pixel(rb, x, prev_y_1, final_col);
      }
      if (not b2)

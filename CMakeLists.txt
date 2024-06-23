@@ -13,6 +13,7 @@ set(CMAKE_BUILD_TYPE Debug)
 add_subdirectory(src)
 
 target_link_libraries(FPS PRIVATE raylib)
+target_precompile_headers(FPS PRIVATE src/precompiled.h)
 
 include(FetchContent)
 FetchContent_Declare(
