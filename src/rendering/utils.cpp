@@ -9,6 +9,7 @@
 #include <exception>
 #include <iostream>
 #include <limits>
+#include "../math/triangle.h"
 
 namespace fps::rendering {
 
@@ -29,7 +30,7 @@ void draw_line(renderbuffer& rb, int x1, int y1, int x2, int y2, Color const& co
 }
 
 constexpr void barycentric2d(int x1, int y1, int x2, int y2, int x3, int y3, int x, int y,
-                   float& u, float& v, float& w) {
+                   float& u, float& v, float& w, float total_area) {
   using namespace fps::math;
 
   struct vec2d {
@@ -43,7 +44,6 @@ constexpr void barycentric2d(int x1, int y1, int x2, int y2, int x3, int y3, int
         return abs(x * rhs.y - y * rhs.x);
      }
   };
-  float const total_area = (vec2d{ x2, y2 } - vec2d{ x1, y1 }).cross(vec2d{ x3, y3 } - vec2d{ x1, y1 });
   u = (vec2d{ x, y } - vec2d{ x3, y3 }).cross(vec2d{ x2, y2 } - vec2d{ x3, y3 }) / total_area;
   v = (vec2d{ x, y } - vec2d{ x1, y1 }).cross(vec2d{ x3, y3 } - vec2d{ x1, y1 }) / total_area;
   w = 1.0f - u - v; 
@@ -51,12 +51,6 @@ constexpr void barycentric2d(int x1, int y1, int x2, int y2, int x3, int y3, int
 
 void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
                    int y3, Color col1, Color col2, Color col3, bool bFill /* = true*/) {
-  // draw_line(rb, x1, y1, x2, y2, col);
-  // draw_line(rb, x2, y2, x3, y3, col);
-  // draw_line(rb, x1, y1, x3, y3, col);
-
-  if (not bFill)
-    return;
 
   using namespace math;
   auto corners =
@@ -74,6 +68,8 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
   int prev_y_1 = line1.value().second, prev_y_2 = line2.value().second;
   bool bSecondHalf{};
   bool b1{true},b2{true};
+  triangle<vec2, int> t{ vec2i{ x1, y1 }, vec2i{ x2, y2 }, vec2i{ x3, y3 } };
+  //float const total_area = (vec2i{ x2, y2 } - vec2i{ x1, y1 }).cross_magnitude(vec2i{ x3, y3 } - vec2i{ x1, y1 });
   while (b1) {
      auto line_min_x_1 = std::numeric_limits<int>::max();
      auto line_max_x_1 = std::numeric_limits<int>::min();
@@ -87,11 +83,13 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
            min_x = std::min(min_x, init.value().first);
            max_x = std::max(max_x, init.value().first);
         float u, v, w;
-        barycentric2d(x1, y1, x2, y2, x3, y3, init.value().first, init.value().second, u, v, w);
+        t.barycentric(vec2i{ init.value().first, init.value().second }, u, v, w);
+        //barycentric2d(x1, y1, x2, y2, x3, y3, init.value().first, init.value().second, u, v, w, total_area);
         Color final_col;
         final_col.r = static_cast<unsigned char>(col1.r * u + col2.r * v + col3.r * w);
         final_col.g = static_cast<unsigned char>(col1.g * u + col2.g * v + col3.g * w);
         final_col.b = static_cast<unsigned char>(col1.b * u + col2.b * v + col3.b * w);
+        final_col.a = static_cast<unsigned char>(col1.a * u + col2.a * v + col3.a * w);
            draw_pixel(rb, init.value().first, init.value().second, final_col);
            prev_y = init.value().second;
            init = interpolator();
@@ -103,6 +101,12 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
      };
      b1 = advance_line(line_min_x_1, line_max_x_1, line1, prev_y_1, bresenham_first);
      b2 = advance_line(line_min_x_2, line_max_x_2, line2, prev_y_2, bSecondHalf ? bresenham_third : bresenham_second);
+     if (not b2)
+        bSecondHalf = true;
+
+     if (not bFill)
+        continue;
+
      int from_x, to_x;
      if (abs(line_max_x_1 - line_min_x_2) < abs(line_max_x_2 - line_min_x_1)) {
         from_x = line_max_x_1;
@@ -118,7 +122,8 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
      // std::cout << "from: " << from_x << ", to: " << to_x << "\n";
      for (int x = from_x; x <= to_x; ++x) {
         float u, v, w;
-        barycentric2d(x1, y1, x2, y2, x3, y3, x, prev_y_1, u, v, w);
+        //barycentric2d(x1, y1, x2, y2, x3, y3, x, prev_y_1, u, v, w, total_area);
+        t.barycentric(vec2i{ x, prev_y_1 }, u, v, w);
         Color final_col;
         final_col.r = static_cast<unsigned char>(col1.r * u + col2.r * v + col3.r * w);
         final_col.g = static_cast<unsigned char>(col1.g * u + col2.g * v + col3.g * w);
@@ -126,8 +131,6 @@ void draw_triangle(renderbuffer& rb, int x1, int y1, int x2, int y2, int x3,
         final_col.a = static_cast<unsigned char>(col1.a * u + col2.a * v + col3.a * w);
         draw_pixel(rb, x, prev_y_1, final_col);
      }
-     if (not b2)
-        bSecondHalf = true;
   }
 }
 } // namespace fps::rendering

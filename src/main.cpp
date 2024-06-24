@@ -11,10 +11,10 @@
 
 using namespace fps::math;
 
-const std::array<fps::math::vec4, 3> triangle = {
-   fps::math::vec4{ 0.0f, 10.5f, -40.0f, 1.0f },
-   fps::math::vec4{ -10.5f, 0.5f, -40.0f, 1.0f },
-   fps::math::vec4{ 10.5f, -10.5f, -40.0f, 1.0f },
+const std::array<fps::math::vec4f, 3> triangle = {
+   fps::math::vec4f{ 0.0f, 10.5f, -40.0f, 1.0f },
+   fps::math::vec4f{ -10.5f, 0.5f, -40.0f, 1.0f },
+   fps::math::vec4f{ 10.5f, -10.5f, -40.0f, 1.0f },
 };
 
 int main() {
@@ -83,7 +83,7 @@ int main() {
          // fps::rendering::draw_line(screen, p2[0], p2[1], p3[0], p3[1], RED);
          // fps::rendering::draw_line(screen, p3[0], p3[1], p1[0], p1[1], RED);
 
-         fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, GREEN, BLUE);
+         fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, GREEN, BLUE, false);
          auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
          avg_time += dur.count();
          if (avg_time > 0)
