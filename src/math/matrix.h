@@ -31,8 +31,8 @@ namespace fps::math {
       }
 
 
-      constexpr vec4 operator*(const vec4& v) const {
-         return vec4{
+      constexpr vec4f operator*(const vec4f& v) const {
+         return vec4f{
             m_data[0][0] * v[0] + m_data[0][1] * v[1] + m_data[0][2] * v[2] + m_data[0][3] * v[3],
             m_data[1][0] * v[0] + m_data[1][1] * v[1] + m_data[1][2] * v[2] + m_data[1][3] * v[3],
             m_data[2][0] * v[0] + m_data[2][1] * v[1] + m_data[2][2] * v[2] + m_data[2][3] * v[3],
