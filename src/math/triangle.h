@@ -56,6 +56,11 @@ namespace fps::math {
       auto plane() const noexcept {
          return fps::math::basic_plane<FloatingPointType>{ normal(), vertices_[0] };
       }
+
+      __attribute__((always_inline))
+      constexpr auto const& operator[](std::size_t nIdx) const noexcept {
+         return vertices_[nIdx];
+      }
    };
 }
 

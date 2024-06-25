@@ -30,6 +30,7 @@ add_executable(
    src/test/matrix_test.cpp
    src/test/plane_test.cpp
    src/test/line_test.cpp
+   src/test/triangle_test.cpp
 )
 target_link_libraries(
    tests

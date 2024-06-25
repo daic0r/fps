@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../math/line.h"
+#include "../math/intersection.h"
 
 TEST(LineTest, PlaneTests) {
    using namespace fps::math;
@@ -8,7 +9,7 @@ TEST(LineTest, PlaneTests) {
 
    plane pl{ vec3f{ 0.0f, 0.0f, 1.0f }, vec3f{ 0.0f, 0.0f, 0.5f } };
 
-   auto res = l.intersects(pl);
+   auto res = intersects(l, pl);
    EXPECT_TRUE(res.has_value());
    EXPECT_EQ(res.value()[0], 0.5f);
    EXPECT_EQ(res.value()[1], 0.5f);
@@ -22,7 +23,7 @@ TEST(LineTest, TriangleTests) {
 
    triangle tr{ vec3f{ 0.0f, 0.0f, 0.0f }, vec3f{ 1.0f, 0.0f, 0.0f }, vec3f{ 0.0f, 1.0f, 0.0f } };
 
-   auto res = l.intersects(tr);
+   auto res = intersects(l, tr);
    EXPECT_TRUE(res.has_value());
    EXPECT_EQ(res.value()[0], 0.0f);
    EXPECT_EQ(res.value()[1], 0.0f);
@@ -30,7 +31,7 @@ TEST(LineTest, TriangleTests) {
 
    triangle tr2{ vec3f{ 0.0f, 0.0f, 0.5f }, vec3f{ 1.0f, 0.0f, 0.5f }, vec3f{ 0.0f, 1.0f, 0.5f } };
 
-   res = l.intersects(tr2);
+   res = intersects(l, tr2);
    EXPECT_TRUE(res.has_value());
    EXPECT_EQ(res.value()[0], 0.5f);
    EXPECT_EQ(res.value()[1], 0.5f);

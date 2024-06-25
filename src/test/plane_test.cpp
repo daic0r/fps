@@ -9,12 +9,12 @@ TEST(PlaneTests, BasicAssertions) {
    EXPECT_TRUE(p.is_point_on_plane(vec3f{ 0.0f, 10.0f, -1.0f }));
    EXPECT_TRUE(p.is_point_on_plane(vec3f{ 0.0f, -10.0f, -1.0f }));
 
-   EXPECT_EQ(p.get_orientation(vec3f{ 0.0f, 0.0f, 10.0f }), plane::Orientation::IN_FRONT);
-   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, 1.0f }), plane::Orientation::IN_FRONT);
+   EXPECT_EQ(p.get_orientation(vec3f{ 0.0f, 0.0f, 10.0f }), Orientation::IN_FRONT);
+   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, 1.0f }), Orientation::IN_FRONT);
 
-   EXPECT_EQ(p.get_orientation(vec3f{ 0.0f, 0.0f, -10.0f }), plane::Orientation::BEHIND);
-   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, -1.0001f }), plane::Orientation::BEHIND);
+   EXPECT_EQ(p.get_orientation(vec3f{ 0.0f, 0.0f, -10.0f }), Orientation::BEHIND);
+   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, -1.0001f }), Orientation::BEHIND);
 
-   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, -1.0f }), plane::Orientation::ON);
+   EXPECT_EQ(p.get_orientation(vec3f{ 10.0f, 50.0f, -1.0f }), Orientation::ON);
 }
 

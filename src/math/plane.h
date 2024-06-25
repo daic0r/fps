@@ -5,6 +5,11 @@
 #include "utils.h"
 
 namespace fps::math {
+   enum class Orientation {
+      IN_FRONT,
+      ON,
+      BEHIND
+   };
 
    template<typename NumericType>
    class basic_plane {
@@ -14,11 +19,6 @@ namespace fps::math {
       NumericType d_;
 
    public:
-      enum Orientation {
-         IN_FRONT,
-         ON,
-         BEHIND
-      };
 
       constexpr auto const& normal() const noexcept {
          return normal_;
@@ -42,11 +42,11 @@ namespace fps::math {
          const auto fOrient = normal_.dot(p) - d_;
          switch (static_cast<int>(sgn(fOrient))) {
             case -1:
-               return BEHIND;
+               return Orientation::BEHIND;
             case 1:
-               return IN_FRONT;
+               return Orientation::IN_FRONT;
          }
-         return ON;
+         return Orientation::ON;
       }
    };
 
