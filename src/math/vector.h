@@ -12,26 +12,35 @@ namespace fps::math {
 
       // !!! These just slow things down considerably !!!
       //
-      // constexpr vec() = default;
-      // constexpr vec(vec const&) = default;
-      // template<std::size_t M>
-      // __attribute__((always_inline))
-      // constexpr vec(vec<Derived, M, NumericType> const& other) {
-      //    std::copy_n(std::execution::par_unseq, other.data_.begin(), std::min(N, M), data_.begin());
-      // }
-      // constexpr vec& operator=(vec const&) = default;
-      // template<std::size_t M>
-      // __attribute__((always_inline))
-      // constexpr vec& operator=(vec<Derived, M, NumericType> const& other) {
-      //    std::copy_n(std::execution::par_unseq,other.data_.begin(), std::min(N, M), data_.begin());
-      //    return *this;
-      // }
-      // constexpr vec(vec&&) = default;
-      // constexpr vec& operator=(vec&&) = default;
-      // __attribute__((always_inline))
-      // constexpr vec(std::initializer_list<NumericType> list) {
-      //    std::copy(std::execution::par_unseq,list.begin(), list.end(), data_.begin());
-      // }
+      constexpr vec() = default;
+      constexpr vec(vec const&) = default;
+      template<std::size_t M>
+      __attribute__((always_inline))
+      constexpr vec(vec<Derived, M, NumericType> const& other) {
+         //std::copy_n(std::execution::par_unseq, other.data_.begin(), std::min(N, M), data_.begin());
+         for (std::size_t i = 0; i < std::min(N, M); ++i) {
+            data_[i] = other[i];
+         }
+      }
+      constexpr vec& operator=(vec const&) = default;
+      template<std::size_t M>
+      __attribute__((always_inline))
+      constexpr vec& operator=(vec<Derived, M, NumericType> const& other) {
+         //std::copy_n(std::execution::par_unseq,other.data_.begin(), std::min(N, M), data_.begin());
+         for (std::size_t i = 0; i < std::min(N, M); ++i) {
+            data_[i] = other[i];
+         }
+         return *this;
+      }
+      constexpr vec(vec&&) = default;
+      constexpr vec& operator=(vec&&) = default;
+      __attribute__((always_inline))
+      constexpr vec(std::initializer_list<NumericType> list) {
+         //std::copy(std::execution::par_unseq,list.begin(), list.end(), data_.begin());
+         for (std::size_t i = 0; i < std::min(N, list.size()); ++i) {
+            data_[i] = *(list.begin() + i);
+         }
+      }
 
       __attribute__((always_inline))
       constexpr NumericType& operator[](std::size_t index) noexcept {
@@ -42,7 +51,7 @@ namespace fps::math {
          return data_[index];
       }
       __attribute__((always_inline))
-      constexpr auto operator+(vec const& rhs) const noexcept {
+      constexpr auto operator+(Derived const& rhs) const noexcept {
          Derived result{};
          //std::transform(std::execution::par_unseq, data_.begin(), data_.end(), rhs.data_.begin(), result.data_.begin(), std::plus{});
          for (std::size_t i = 0; i < N; ++i) {
@@ -51,7 +60,7 @@ namespace fps::math {
          return result;
       }
       __attribute__((always_inline))
-      constexpr auto operator-(vec const& rhs) const noexcept {
+      constexpr auto operator-(Derived const& rhs) const noexcept {
          Derived result{};
          //std::transform(std::execution::par_unseq, data_.begin(), data_.end(), rhs.data_.begin(), result.data_.begin(), std::minus{});
          for (std::size_t i = 0; i < N; ++i) {
@@ -97,11 +106,11 @@ namespace fps::math {
          return std::sqrt(dot(*this));
       }
       __attribute__((always_inline))
-      constexpr vec normalize() const noexcept {
-         return *this / length();
+      constexpr auto normalize() const noexcept {
+         return Derived{ *this / length() };
       }
       __attribute__((always_inline))
-      constexpr bool operator==(vec const& rhs) const noexcept {
+      constexpr bool operator==(Derived const& rhs) const noexcept {
          return std::all_of(std::execution::par_unseq, data_.begin(), data_.end(), [&rhs, i = 0](auto const& elem) mutable {
             return test_equal(elem, rhs[i++]);
          });
@@ -110,34 +119,43 @@ namespace fps::math {
 
    template<typename NumericType>
    struct vec2 : vec<vec2<NumericType>, 2, NumericType> {
+      using base = vec<vec2<NumericType>, 2, NumericType>;
+      using base::base;
+
       constexpr vec2() = default;
       __attribute__((always_inline))
       constexpr vec2(NumericType x, NumericType y) 
          : vec<vec2<NumericType>, 2, NumericType>{ x, y } {}
       __attribute__((always_inline))
       constexpr NumericType cross_magnitude(vec2 const& rhs) const noexcept {
-         using base = vec<vec2<NumericType>, 2, NumericType>;
          return abs(base::data_[0] * rhs[1] - base::data_[1] * rhs[0]);
       } 
    };
 
    template<typename NumericType>
    struct vec3 : vec<vec3<NumericType>, 3, NumericType> {
+      using base = vec<vec3<NumericType>, 3, NumericType>;
+      using base::base;
+      using base::operator==;
+
       constexpr vec3() = default;
       __attribute__((always_inline))
       constexpr vec3(NumericType x, NumericType y, NumericType z) 
          : vec<vec3<NumericType>, 3, NumericType>{ x, y, z } {}
       __attribute__((always_inline))
       constexpr vec3 cross(vec3 const& rhs) const noexcept {
-         using base = vec<vec3<NumericType>, 3, NumericType>;
          return vec3{ base::data_[1] * rhs[2] - base::data_[2] * rhs[1],
                       base::data_[2] * rhs[0] - base::data_[0] * rhs[2],
                       base::data_[0] * rhs[1] - base::data_[1] * rhs[0] };
       }
+
    };
 
    template<typename NumericType>
    struct vec4 : vec<vec4<NumericType>, 4, NumericType> {
+      using base = vec<vec4<NumericType>, 4, NumericType>;
+      using base::base;
+
       constexpr vec4() = default;
       __attribute__((always_inline))
       constexpr vec4(NumericType x, NumericType y, NumericType z, NumericType w) 

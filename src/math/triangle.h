@@ -2,6 +2,7 @@
 #define TRIANGLE_H
 
 #include "vector.h"
+#include "plane.h"
 
 namespace fps::math {
 
@@ -26,6 +27,7 @@ namespace fps::math {
 
 
    public:
+      __attribute__((always_inline))
       constexpr triangle(vec_t v0, vec_t v1, vec_t v2) :
          vertices_{v0, v1, v2}, 
          area_{ get_cross_magnitude(vertices_[1] - vertices_[0], vertices_[2] - vertices_[0]) },
@@ -43,6 +45,16 @@ namespace fps::math {
         u = abs(v1[0] * side1_[1] - v1[1] * side1_[0]) / static_cast<float>(area_);
         v = abs(v2[0] * side2_[1] - v2[1] * side2_[0]) / static_cast<float>(area_);
         w = 1.0f - u - v; 
+      }
+
+      __attribute__((always_inline))
+      auto normal() const noexcept {
+         return (vertices_[1] - vertices_[0]).cross(vertices_[2] - vertices_[0]).normalize();
+      }
+      
+      __attribute__((always_inline))
+      auto plane() const noexcept {
+         return fps::math::basic_plane<FloatingPointType>{ normal(), vertices_[0] };
       }
    };
 }

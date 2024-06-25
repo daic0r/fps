@@ -10,5 +10,6 @@
 #include <algorithm>
 #include <numeric>
 #include <execution>
+#include <optional>
 
 #endif

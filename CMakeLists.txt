@@ -28,6 +28,8 @@ add_executable(
    tests
    src/test/vector_test.cpp
    src/test/matrix_test.cpp
+   src/test/plane_test.cpp
+   src/test/line_test.cpp
 )
 target_link_libraries(
    tests

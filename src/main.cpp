@@ -83,7 +83,7 @@ int main() {
          // fps::rendering::draw_line(screen, p2[0], p2[1], p3[0], p3[1], RED);
          // fps::rendering::draw_line(screen, p3[0], p3[1], p1[0], p1[1], RED);
 
-         fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, GREEN, BLUE, false);
+         fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, GREEN, BLUE, true);
          auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
          avg_time += dur.count();
          if (avg_time > 0)
