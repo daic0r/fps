@@ -4,33 +4,30 @@
 #include "triangle.h"
 #include "line.h"
 #include "intersection.h"
+#include <bitset>
 
 namespace fps::math {
    
    template<template<typename> typename Vec, typename NumericType, typename triangle_t = triangle<Vec, NumericType>>
-      __attribute__((always_inline))
       std::pair<std::optional<triangle_t>, std::optional<triangle_t>> clip(triangle<Vec, NumericType> const& tr, basic_plane<NumericType> const& pln) noexcept {
-         std::array<bool, 3> arInFront{}, arBack{};
-         int nCountFront{}, nCountBack{};
+         std::bitset<3> back, front;
 
          for (int i = 0; i < 3; ++i) {
             auto const orient = pln.get_orientation(tr[i]);
             if (orient == Orientation::BEHIND) {
-               arBack[i] = true;
-               ++nCountBack;
+               back.set(i);
             }
             else {
-               arInFront[i] = true;
-               ++nCountFront;
+               front.set(i);
             }
          }
 
-         if (nCountFront == 3 or nCountBack == 3)
+         if (back.count() == 3 or front.count() == 3)
             return { std::nullopt, std::nullopt };
 
-         auto const find_single = [](std::array<bool, 3> const& arr) -> std::size_t {
-            for (int i = 0; i < 3; ++i) {
-               if (arr[i]) {
+         auto const find_single = [](std::bitset<3> const& bs) -> std::size_t {
+            for (std::size_t i = 0; i < 3; ++i) {
+               if (bs.test(i)) {
                   return i;
                }
             }
@@ -45,19 +42,18 @@ namespace fps::math {
             return std::make_pair(*p1, *p2);
          };
 
-
-         if (nCountFront == 1) {
-            auto const nWhichFront = find_single(arInFront);
+         // One point in front of the plane
+         if (front.count() == 1) {
+            auto const nWhichFront = find_single(front);
             auto const points = find_intersect_points(nWhichFront);
-            auto ret = triangle{ tr[0], points.first, points.second };
-            return { ret, std::nullopt }; 
+            return { triangle{ tr[nWhichFront], points.first, points.second }, std::nullopt }; 
          }
 
-         auto const nWhichBack = find_single(arBack); 
+         // Two points in front of the plane
+         auto const nWhichBack = find_single(back); 
          auto const points = find_intersect_points(nWhichBack);
-         auto ret1 = triangle{ points.first, tr[(nWhichBack + 1) % 3], tr[(nWhichBack + 2) % 3] };
-         auto ret2 = triangle{ points.first, tr[(nWhichBack + 2) % 3], points.second };
-         return { ret1, ret2 }; 
+         return { triangle{ points.first, tr[(nWhichBack + 1) % 3], tr[(nWhichBack + 2) % 3] }, 
+                  triangle{ points.first, tr[(nWhichBack + 2) % 3], points.second } }; 
       }
 }
 
