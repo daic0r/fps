@@ -14,18 +14,18 @@ namespace fps::math {
       //
       constexpr vec() = default;
       constexpr vec(vec const&) = default;
-      template<std::size_t M>
+      template<typename T, std::size_t M>
       __attribute__((always_inline))
-      constexpr vec(vec<Derived, M, NumericType> const& other) {
+      constexpr vec(vec<T, M, NumericType> const& other) {
          //std::copy_n(std::execution::par_unseq, other.data_.begin(), std::min(N, M), data_.begin());
          for (std::size_t i = 0; i < std::min(N, M); ++i) {
             data_[i] = other[i];
          }
       }
       constexpr vec& operator=(vec const&) = default;
-      template<std::size_t M>
+      template<typename T, std::size_t M>
       __attribute__((always_inline))
-      constexpr vec& operator=(vec<Derived, M, NumericType> const& other) {
+      constexpr vec& operator=(vec<T, M, NumericType> const& other) {
          //std::copy_n(std::execution::par_unseq,other.data_.begin(), std::min(N, M), data_.begin());
          for (std::size_t i = 0; i < std::min(N, M); ++i) {
             data_[i] = other[i];
