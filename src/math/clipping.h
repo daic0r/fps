@@ -9,7 +9,7 @@
 namespace fps::math {
    
    template<template<typename> typename Vec, typename NumericType, typename triangle_t = triangle<Vec, NumericType>>
-      std::pair<std::optional<triangle_t>, std::optional<triangle_t>> clip(triangle<Vec, NumericType> const& tr, basic_plane<NumericType> const& pln) noexcept {
+      constexpr std::tuple<bool, std::optional<triangle_t>, std::optional<triangle_t>> clip(triangle<Vec, NumericType> const& tr, basic_plane<NumericType> const& pln) noexcept {
          std::bitset<3> back, front;
 
          for (int i = 0; i < 3; ++i) {
@@ -22,8 +22,12 @@ namespace fps::math {
             }
          }
 
-         if (back.count() == 3 or front.count() == 3)
-            return { std::nullopt, std::nullopt };
+         if (back.count() == 3) {
+            return { false, std::nullopt, std::nullopt };
+         }
+         if (front.count() == 3) {
+            return { true, std::nullopt, std::nullopt };
+         }
 
          auto const find_single = [](std::bitset<3> const& bs) -> std::size_t {
             for (std::size_t i = 0; i < 3; ++i) {
@@ -46,13 +50,13 @@ namespace fps::math {
          if (front.count() == 1) {
             auto const nWhichFront = find_single(front);
             auto const points = find_intersect_points(nWhichFront);
-            return { triangle{ tr[nWhichFront], points.first, points.second }, std::nullopt }; 
+            return { true, triangle{ tr[nWhichFront], points.first, points.second }, std::nullopt }; 
          }
 
          // Two points in front of the plane
          auto const nWhichBack = find_single(back); 
          auto const points = find_intersect_points(nWhichBack);
-         return { triangle{ points.first, tr[(nWhichBack + 1) % 3], tr[(nWhichBack + 2) % 3] }, 
+         return { true, triangle{ points.first, tr[(nWhichBack + 1) % 3], tr[(nWhichBack + 2) % 3] }, 
                   triangle{ points.first, tr[(nWhichBack + 2) % 3], points.second } }; 
       }
 }

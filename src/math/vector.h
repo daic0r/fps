@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <execution>
+#include <iostream>
 
 namespace fps::math {
 
@@ -160,6 +161,12 @@ namespace fps::math {
       __attribute__((always_inline))
       constexpr vec4(NumericType x, NumericType y, NumericType z, NumericType w) 
          : vec<vec4<NumericType>, 4, NumericType>{ x, y, z, w } {}
+      __attribute__((always_inline))
+      constexpr vec4 cross(vec4 const& rhs) const noexcept {
+         return vec4{ base::data_[1] * rhs[2] - base::data_[2] * rhs[1],
+                      base::data_[2] * rhs[0] - base::data_[0] * rhs[2],
+                      base::data_[0] * rhs[1] - base::data_[1] * rhs[0] };
+      }
    };
 
 
@@ -172,8 +179,13 @@ namespace fps::math {
    using vec4i = vec4<int>;
 
    struct vertex : vec4f {
+      unsigned char r,g,b,a;
+
       constexpr vertex() = default;
-      constexpr vertex(float x, float y, float z, float w = 1.0f) : vec4f{ x, y, z, w } {}
+      constexpr vertex(float x, float y, float z, float w = 1.0f) 
+         : vec4f{ x, y, z, w },
+         r{ 255 }, g{ 255 }, b{ 255 }, a{ 255 }
+      {}
    };
 
    struct coord2d {

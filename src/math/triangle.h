@@ -3,15 +3,13 @@
 
 #include "vector.h"
 #include "plane.h"
+#include "matrix.h"
 
 namespace fps::math {
 
    template<template<typename> typename Vec, typename FloatingPointType>
    class triangle {
       using vec_t = Vec<FloatingPointType>;
-
-      static_assert(std::is_same_v<vec_t, vec2<FloatingPointType>> or
-            std::is_same_v<vec_t, vec3<FloatingPointType>>, "Only 2D and 3D triangles are supported");
 
       std::array<vec_t, 3> vertices_;
       FloatingPointType area_;
@@ -60,6 +58,18 @@ namespace fps::math {
       __attribute__((always_inline))
       constexpr auto const& operator[](std::size_t nIdx) const noexcept {
          return vertices_[nIdx];
+      }
+
+      __attribute__((always_inline))
+      constexpr auto& operator[](std::size_t nIdx)  noexcept {
+         return vertices_[nIdx];
+      }
+
+      __attribute__((always_inline))
+      constexpr void transform(matrix const& m) noexcept {
+         for (auto& v : vertices_) {
+            v = m * v;
+         }
       }
    };
 }

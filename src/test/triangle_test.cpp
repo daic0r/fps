@@ -12,17 +12,17 @@ TEST(TriangleTest, Clipping) {
 
    auto ret = clip(tr, p);
 
-   if (ret.first) {
+   if (std::get<1>(ret)) {
       std::cout << "First triangle:\n";
-      std::cout << "(" << (*ret.first)[0][0] << ' ' << (*ret.first)[0][1] << ' ' << (*ret.first)[0][2] << ")" << '\n';
-      std::cout << "(" << (*ret.first)[1][0] << ' ' << (*ret.first)[1][1] << ' ' << (*ret.first)[1][2] << ")" << '\n';
-      std::cout << "(" << (*ret.first)[2][0] << ' ' << (*ret.first)[2][1] << ' ' << (*ret.first)[2][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<1>(ret))[0][0] << ' ' << (*std::get<1>(ret))[0][1] << ' ' << (*std::get<1>(ret))[0][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<1>(ret))[1][0] << ' ' << (*std::get<1>(ret))[1][1] << ' ' << (*std::get<1>(ret))[1][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<1>(ret))[2][0] << ' ' << (*std::get<1>(ret))[2][1] << ' ' << (*std::get<1>(ret))[2][2] << ")" << '\n';
    }
-   if (ret.second) {
+   if (std::get<2>(ret)) {
       std::cout << "Second triangle:\n";
-      std::cout << "(" << (*ret.second)[0][0] << ' ' << (*ret.second)[0][1] << ' ' << (*ret.second)[0][2] << ")" << '\n';
-      std::cout << "(" << (*ret.second)[1][0] << ' ' << (*ret.second)[1][1] << ' ' << (*ret.second)[1][2] << ")" << '\n';
-      std::cout << "(" << (*ret.second)[2][0] << ' ' << (*ret.second)[2][1] << ' ' << (*ret.second)[2][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<2>(ret))[0][0] << ' ' << (*std::get<2>(ret))[0][1] << ' ' << (*std::get<2>(ret))[0][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<2>(ret))[1][0] << ' ' << (*std::get<2>(ret))[1][1] << ' ' << (*std::get<2>(ret))[1][2] << ")" << '\n';
+      std::cout << "(" << (*std::get<2>(ret))[2][0] << ' ' << (*std::get<2>(ret))[2][1] << ' ' << (*std::get<2>(ret))[2][2] << ")" << '\n';
    }
 }
 

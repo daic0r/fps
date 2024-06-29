@@ -114,8 +114,24 @@ namespace fps::rendering {
                bresenham_first);
          b2 = advance_line(line_min_x_2, line_max_x_2, line2, prev_y_2,
                bSecondHalf ? bresenham_third : bresenham_second);
-         if (not b2)
+         if (not b2) {
             bSecondHalf = true;
+            if (not b1) {
+               // We have a trinagle like this if we get here (flat bottom):
+               //
+               //   /
+               //  /|
+               // / |
+               // ---
+               //
+               // There is no second half, so do one pass for the bottom line here
+               // because after this iteration the loop will exit
+               line_min_x_2 = std::numeric_limits<int>::max();
+               line_max_x_2 = std::numeric_limits<int>::min();
+               advance_line(line_min_x_2, line_max_x_2, line2, prev_y_2,
+                     bresenham_third);
+            }
+         }
 
          if (not bFill)
             continue;

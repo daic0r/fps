@@ -11,5 +11,6 @@
 #include <numeric>
 #include <execution>
 #include <optional>
+#include <span>
 
 #endif

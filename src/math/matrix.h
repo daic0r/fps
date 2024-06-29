@@ -50,13 +50,13 @@ namespace fps::math {
          return result;
       }
 
-      static constexpr matrix perspective(float fovH, float fAspectRatio, float fNear, float fFar) {
-         const auto fov2 = fovH * 0.5f;
+      static constexpr matrix perspective(float fovV, float fAspectRatio, float fNear, float fFar) {
+         const auto fov2 = fovV * 0.5f;
          const auto denom = fNear - fFar;
          matrix ret{};
-         ret[0,0] = 1.0f / tanf(fov2);
-         ret[1,1] = 1.0f / tanf((1.0f / fAspectRatio) * fov2);
-         ret[2,2] = -(fNear + fFar) / denom;
+         ret[0,0] = 1.0f / (tanf(fov2) * fAspectRatio);
+         ret[1,1] = 1.0f / tanf(fov2);
+         ret[2,2] = (fNear + fFar) / denom;
          ret[2,3] = (2.0f * fNear * fFar) / denom;
          ret[3,2] = -1.0f;
          return ret;
@@ -70,6 +70,12 @@ namespace fps::math {
          ret[1,1] = -h2;
          ret[1,3] = h2 + y;
          return ret;
+      }
+      static constexpr matrix identity() noexcept {
+         return matrix{ 1.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 1.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f };
       }
 
       constexpr bool operator==(const matrix& other) const {
