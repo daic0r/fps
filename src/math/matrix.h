@@ -77,6 +77,36 @@ namespace fps::math {
                         0.0f, 0.0f, 1.0f, 0.0f,
                         0.0f, 0.0f, 0.0f, 1.0f };
       }
+      static constexpr matrix rotate_x(float angle) noexcept {
+         const auto s = sinf(angle);
+         const auto c = cosf(angle);
+         return matrix{ 1.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, c, s, 0.0f,
+                        0.0f, -s, c, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f };
+      }
+      static constexpr matrix rotate_y(float angle) noexcept {
+         const auto s = sinf(angle);
+         const auto c = cosf(angle);
+         return matrix{ c, 0.0f, -s, 0.0f,
+                        0.0f, 1.0f, 0.0f, 0.0f,
+                        s, 0.0f, c, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f };
+      }
+      static constexpr matrix rotate_z(float angle) noexcept {
+         const auto s = sinf(angle);
+         const auto c = cosf(angle);
+         return matrix{ c, s, 0.0f, 0.0f,
+                        -s, c, 0.0f, 0.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f };
+      }
+      static constexpr matrix translate(float x, float y, float z) noexcept {
+         return matrix{ 1.0f, 0.0f, 0.0f, x,
+                        0.0f, 1.0f, 0.0f, y,
+                        0.0f, 0.0f, 1.0f, z,
+                        0.0f, 0.0f, 0.0f, 1.0f };
+      }
 
       constexpr bool operator==(const matrix& other) const {
          for (std::size_t i = 0; i < 4; ++i) {

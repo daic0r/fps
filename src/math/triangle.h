@@ -25,6 +25,15 @@ namespace fps::math {
 
 
    public:
+      constexpr bool operator==(triangle const& rhs) const noexcept {
+         for (std::size_t i = 0; i < 3; ++i) {
+            if (vertices_[i] != rhs.vertices_[i]) {
+               return false;
+            }
+         }
+         return true;
+      }
+
       __attribute__((always_inline))
       constexpr triangle(vec_t v0, vec_t v1, vec_t v2) :
          vertices_{v0, v1, v2}, 

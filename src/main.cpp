@@ -28,14 +28,14 @@ const std::array<fps::math::vec4f, 3> ar_triangle = {
 
 const auto cube = fps::rendering::model {
    std::vector<fps::math::vertex>{
-      vertex{ -10.0, -10.0, -80.0, 1.0 },
-      vertex{ 10.0, -10.0, -80.0, 1.0 },
-      vertex{ 10.0, 10.0, -80.0, 1.0 },
-      vertex{ -10.0, 10.0, -80.0, 1.0 },
-      vertex{ -10.0, -10.0, -60.0, 1.0 }, // 4
-      vertex{ 10.0, -10.0, -60.0, 1.0 },
-      vertex{ 10.0, 10.0, -60.0, 1.0 }, // 6
-      vertex{ -10.0, 10.0, -60.0, 1.0 }
+      vertex{ -10.0, -10.0, -10.0, 1.0 },
+      vertex{ 10.0, -10.0, -10.0, 1.0 },
+      vertex{ 10.0, 10.0, -10.0, 1.0 },
+      vertex{ -10.0, 10.0, -10.0, 1.0 },
+      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4
+      vertex{ 10.0, -10.0, 10.0, 1.0 },
+      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6
+      vertex{ -10.0, 10.0, 10.0, 1.0 }
    },
    // counter-clockwise indices
    std::vector<std::size_t>{
@@ -130,10 +130,12 @@ int main() {
          
    int avg_time = 0;
    std::array<matrix, 1> instances{ matrix::identity() };
+   float fAngle = 0.0f;
    while (!WindowShouldClose()) {
       BeginDrawing();
-         //ClearBackground(BLACK);
-
+         ClearBackground(BLACK);
+         screen.clear();
+         instances[0] = matrix::translate(0.0f, 0.0f, -30.0f) * matrix::rotate_y(fAngle);
 
          //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
          //draw_triangle(p1, p2, p3);
@@ -153,6 +155,8 @@ int main() {
          DrawTexture(tex, 0, 0, WHITE);
          //fps::rendering::draw_triangle(400, 600, 300, 500, 500, 300, GREEN);
       EndDrawing();
+      fAngle += 0.01f;
+      fAngle = std::fmod(fAngle, 2.0f * std::numbers::pi_v<float>);
    }
 
    UnloadTexture(tex);

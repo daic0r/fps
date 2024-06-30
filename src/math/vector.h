@@ -112,9 +112,12 @@ namespace fps::math {
       }
       __attribute__((always_inline))
       constexpr bool operator==(Derived const& rhs) const noexcept {
-         return std::all_of(std::execution::par_unseq, data_.begin(), data_.end(), [&rhs, i = 0](auto const& elem) mutable {
-            return test_equal(elem, rhs[i++]);
-         });
+         for (std::size_t i = 0; i < N; ++i) {
+            if (data_[i] != rhs.data_[i]) {
+               return false;
+            }
+         }
+         return true;
       }
    };
 

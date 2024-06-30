@@ -1,6 +1,7 @@
 #ifndef RENDERING_RENDERBUFFER_H
 #define RENDERING_RENDERBUFFER_H
 
+#include <cstring>
 #include <memory>
 
 namespace fps::rendering {
@@ -21,6 +22,8 @@ namespace fps::rendering {
 
       auto width() const noexcept { return width_; } 
       auto height() const noexcept { return height_; }
+
+      void clear() { std::memset(buffer_.get(), 0, width_ * height_ * 4); }
    };
 }
 

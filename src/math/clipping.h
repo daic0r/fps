@@ -5,6 +5,8 @@
 #include "line.h"
 #include "intersection.h"
 #include <bitset>
+#include <cassert>
+#include <optional>
 
 namespace fps::math {
    
@@ -12,13 +14,39 @@ namespace fps::math {
       constexpr std::tuple<bool, std::optional<triangle_t>, std::optional<triangle_t>> clip(triangle<Vec, NumericType> const& tr, basic_plane<NumericType> const& pln) noexcept {
          std::bitset<3> back, front;
 
+         std::size_t nOn{};
          for (int i = 0; i < 3; ++i) {
             auto const orient = pln.get_orientation(tr[i]);
             if (orient == Orientation::BEHIND) {
                back.set(i);
             }
-            else {
+            else 
+            if (orient == Orientation::IN_FRONT) {
                front.set(i);
+            }
+            else {
+               ++nOn;
+            }
+         }
+
+         if (nOn == 3) {
+            return { true, std::nullopt, std::nullopt };
+         } else
+         if (nOn == 2) {
+            if (back.count() == 1)
+               return { false, std::nullopt, std::nullopt };
+            else
+            if (front.count() == 1) {
+               return { true, std::nullopt, std::nullopt };
+            }
+         }
+         else
+         if (nOn == 1) {
+            if (back.count() == 2)
+               return { false, std::nullopt, std::nullopt };
+            else
+            if (front.count() == 2) {
+               return { true, std::nullopt, std::nullopt };
             }
          }
 
@@ -28,6 +56,7 @@ namespace fps::math {
          if (front.count() == 3) {
             return { true, std::nullopt, std::nullopt };
          }
+         
 
          auto const find_single = [](std::bitset<3> const& bs) -> std::size_t {
             for (std::size_t i = 0; i < 3; ++i) {
