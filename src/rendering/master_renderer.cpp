@@ -23,44 +23,23 @@ namespace fps::rendering {
             tri[0] = tri[0] / tri[0][3];
             tri[1] = tri[1] / tri[1][3];
             tri[2] = tri[2] / tri[2][3];
-            bool bCompletelyContained{ true };
-            clip_triangles_.push_back(tri);
-            auto end_iter = clip_triangles_.end();
-            auto new_end_iter = clip_triangles_.end();
+            clip_triangles_.push_front(tri);
             for (auto const& pln : ndc_planes_) {
                auto iter = clip_triangles_.begin();
-               while (iter != end_iter) {
-                  auto old_iter = iter;
+               while (iter != clip_triangles_.end()) {
                   auto const [clipped, one, two] = clip(*iter, pln);
                   // completely behind plane? -> triangle invisible
                   if (not clipped and not one and not two) {
                      goto done;
                   } else
                   if (clipped and one) {
-                     bCompletelyContained = false;
-                     new_end_iter = clip_triangles_.insert(clip_triangles_.end(), *one);
+                     *iter = *one;
                      if (two) {
-                        new_end_iter = clip_triangles_.insert(clip_triangles_.end(), *two);
+                        iter = clip_triangles_.insert_after(iter, *two);
                      }
-                     if (*iter == tri) {
-                        ++iter;
-                        clip_triangles_.erase(old_iter);
-                     }
-                     // if (one) {
-                     //    ++iter;
-                     //    if (two) {
-                     //       ++iter;
-                     //    }
-                     // }
                   }
-                  if (old_iter == iter)
-                     ++iter;
-                  old_iter = iter;
+                  ++iter;
                }
-               end_iter = new_end_iter;
-            }
-            if (bCompletelyContained) {
-               clip_triangles_.push_back(tri);
             }
 
             // into screenspace

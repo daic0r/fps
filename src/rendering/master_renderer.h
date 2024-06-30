@@ -5,8 +5,8 @@
 #include "../math/matrix.h"
 #include "model.h"
 #include "renderbuffer.h"
+#include <forward_list>
 #include <raylib.h>
-#include <list>
 
 namespace fps::rendering {
    using namespace fps::math;
@@ -28,7 +28,7 @@ namespace fps::rendering {
       matrix projection_matrix_;
       matrix view_matrix_;
       renderbuffer& renderbuffer_;
-      std::list<triangle<vec4, float>> clip_triangles_;
+      std::forward_list<triangle<vec4, float>> clip_triangles_;
 
    public:
       master_renderer(renderbuffer& rb) noexcept : renderbuffer_{ rb } {}
