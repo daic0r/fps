@@ -93,6 +93,10 @@ int main() {
       p1 = persp * tri[0];
       p2 = persp * tri[1];
       p3 = persp * tri[2];
+      std::cout << "Triangle vertices (before w-division):\n";
+      std::cout << "P1: " << p1[0] << ", " << p1[1] << ", " << p1[2] << ", " << p1[3] << '\n';
+      std::cout << "P2: " << p2[0] << ", " << p2[1] << ", " << p2[2] << ", " << p2[3] << '\n';
+      std::cout << "P3: " << p3[0] << ", " << p3[1] << ", " << p3[2] << ", " << p3[3] << '\n';
       p1 = p1 / p1[3];
       p2 = p2 / p2[3];
       p3 = p3 / p3[3];
@@ -135,7 +139,7 @@ int main() {
       BeginDrawing();
          ClearBackground(BLACK);
          screen.clear();
-         instances[0] = matrix::translate(0.0f, 0.0f, -30.0f) * matrix::rotate_y(fAngle);
+         instances[0] = matrix::translate(0.0f, 0.0f, -80.0f) * matrix::rotate_y(fAngle);
 
          //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
          //draw_triangle(p1, p2, p3);
