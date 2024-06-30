@@ -56,8 +56,8 @@ namespace fps::math {
          matrix ret{};
          ret[0,0] = 1.0f / (tanf(fov2) * fAspectRatio);
          ret[1,1] = 1.0f / tanf(fov2);
-         ret[2,2] = -(fNear + fFar) / denom;
-         ret[2,3] = -(2.0f * fNear * fFar) / denom;
+         ret[2,2] = (fNear + fFar) / denom;
+         ret[2,3] = (2.0f * fNear * fFar) / denom;
          ret[3,2] = -1.0f;
          return ret;
       }
