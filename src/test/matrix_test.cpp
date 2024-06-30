@@ -36,10 +36,10 @@ TEST(MatrixTests, PerspectiveMatrix) {
    auto m = matrix::perspective(std::numbers::pi_v<float> / 4.0f, 4.0f/3.0f, 0.1f, 100.0f);
 
    matrix expected = {
-      2.41421f, 0.0f, 0.0f, 0.0f,
-      0.0f, 3.29656f, 0.0f, 0.0f,
-      0.0f, 0.0f, 1.002f, -0.2002f,
-      0.0f, 0.0f, -1.0f, 0.0f
+      1.81066f, 0.0f, 0.0f, 0.0f,
+      0.0f, 2.41421f, 0.0f, 0.0f,
+      0.000000f, 0.000000f, -1.002002f, -0.200200f,
+      0.000000f, 0.000000f, -1.000000f, 0.000000f
    };
    // print it
    for (auto i = 0; i < 4; ++i) {

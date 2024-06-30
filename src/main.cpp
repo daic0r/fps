@@ -139,7 +139,7 @@ int main() {
       BeginDrawing();
          ClearBackground(BLACK);
          screen.clear();
-         instances[0] = matrix::translate(0.0f, 0.0f, -80.0f) * matrix::rotate_y(fAngle);
+         instances[0] = matrix::translate(0.0f, 0.0f, -80.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
 
          //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
          //draw_triangle(p1, p2, p3);
