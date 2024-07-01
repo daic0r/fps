@@ -119,6 +119,12 @@ namespace fps::math {
          }
          return true;
       }
+      __attribute__((always_inline))
+      constexpr void clamp(NumericType min, NumericType max) noexcept {
+         for (std::size_t i = 0; i < N; ++i) {
+            data_[i] = std::clamp(data_[i], min, max);
+         }
+      }
    };
 
    template<typename NumericType>

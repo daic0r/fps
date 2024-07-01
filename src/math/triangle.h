@@ -80,6 +80,13 @@ namespace fps::math {
             v = m * v;
          }
       }
+
+      __attribute__((always_inline))
+      constexpr void clamp_all_vertices(FloatingPointType min, FloatingPointType max) noexcept {
+         for (auto& v : vertices_) {
+            v.clamp(min, max);
+         }
+      }
    };
 }
 

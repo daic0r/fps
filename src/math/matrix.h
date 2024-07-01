@@ -65,10 +65,10 @@ namespace fps::math {
          matrix ret{};
          const auto w2 = 0.5f * width;
          const auto h2 = 0.5f * height;
-         ret[0,0] = w2;
-         ret[0,3] = x + w2;
-         ret[1,1] = -h2;
-         ret[1,3] = h2 + y;
+         ret[0,0] = w2 - 0.5f;
+         ret[0,3] = w2 - 0.5f + x;
+         ret[1,1] = -h2 + 0.5f;
+         ret[1,3] = h2 - 0.5f + y;
          return ret;
       }
       static constexpr matrix identity() noexcept {
