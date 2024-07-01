@@ -26,3 +26,16 @@ TEST(TriangleTest, Clipping) {
    }
 }
 
+TEST(TriangleTest, NormalTest) {
+   using namespace fps::math;
+
+   triangle tr{ vec3f{ -0.5f, 0.0f, 0.0f }, vec3f{ 0.5f, 0.0f, 0.0f }, vec3f{ 0.0f, 1.0f, 0.0f } };
+   auto n = tr.normal();
+   auto expected = vec3f{ 0.0f, 0.0f, 1.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle tr2{ vec3f{ 0.5f, 0.0f, 0.0f }, vec3f{ -0.5f, 0.0f, 0.0f }, vec3f{ 0.0f, 1.0f, 0.0f } };
+   n = tr2.normal();
+   expected = vec3f{ 0.0f, 0.0f, -1.0f };
+   EXPECT_EQ(n, expected);
+}
