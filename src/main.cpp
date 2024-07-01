@@ -72,10 +72,18 @@ int main() {
       }
       std::cout << '\n';
    }
+   std::cout << "Viewport matrix:\n";
+   for (auto i = 0; i < 4; ++i) {
+      for (auto j = 0; j < 4; ++j) {
+         std::cout << viewp[i,j] << ' ';
+      }
+      std::cout << '\n';
+   }
 
    Image img = GenImageColor(width, height, BLACK);
    ImageFormat(&img, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
    auto tex = LoadTextureFromImage(img);
+   UnloadImage(img);
    fps::rendering::renderbuffer screen{ width, height };
    std::memset(screen.buffer(), 0, 800*600*4);
 
@@ -139,7 +147,7 @@ int main() {
       BeginDrawing();
          ClearBackground(BLACK);
          screen.clear();
-         instances[0] = matrix::translate(0.0f, 0.0f, -80.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
+         instances[0] = matrix::translate(0.0f, 0.0f, -30.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
 
          //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
          //draw_triangle(p1, p2, p3);
