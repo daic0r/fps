@@ -13,11 +13,6 @@
 
 namespace fps::rendering {
 
-   void draw_pixel(renderbuffer &rb, int x, int y, Color const &col) {
-      auto const offset = (x + y * rb.width()) * 4;
-      std::memcpy(rb.buffer() + offset, &col, sizeof(Color));
-   }
-
    void draw_line(renderbuffer &rb, int x1, int y1, int x2, int y2,
          Color const &col) {
       using namespace fps::math;
@@ -25,7 +20,7 @@ namespace fps::rendering {
       auto bresenham = make_bresenham_interpolator(x1, y1, x2, y2);
       auto ret = bresenham();
       while (ret) {
-         draw_pixel(rb, ret.value().first, ret.value().second, col);
+         rb.draw_pixel(ret.value().first, ret.value().second, col);
          ret = bresenham();
       }
    }
@@ -101,7 +96,7 @@ namespace fps::rendering {
                   static_cast<unsigned char>(col1.b * u + col2.b * v + col3.b * w);
                final_col.a =
                   static_cast<unsigned char>(col1.a * u + col2.a * v + col3.a * w);
-               draw_pixel(rb, init.value().first, init.value().second, final_col);
+               rb.draw_pixel(init.value().first, init.value().second, final_col);
                prev_y = init.value().second;
                init = interpolator();
             }
@@ -164,7 +159,7 @@ namespace fps::rendering {
                static_cast<unsigned char>(col1.b * u + col2.b * v + col3.b * w);
             final_col.a =
                static_cast<unsigned char>(col1.a * u + col2.a * v + col3.a * w);
-            draw_pixel(rb, x, prev_y_1, final_col);
+            rb.draw_pixel(x, prev_y_1, final_col);
          }
       }
    }

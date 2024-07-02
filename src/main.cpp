@@ -28,29 +28,27 @@ const std::array<fps::math::vec4f, 3> ar_triangle = {
 
 const auto cube = fps::rendering::model {
    std::vector<fps::math::vertex>{
-      vertex{ -10.0, -10.0, -10.0, 1.0 },
-      vertex{ 10.0, -10.0, -10.0, 1.0 },
-      vertex{ 10.0, 10.0, -10.0, 1.0 },
-      vertex{ -10.0, 10.0, -10.0, 1.0 },
-      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4
-      vertex{ 10.0, -10.0, 10.0, 1.0 },
-      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6
-      vertex{ -10.0, 10.0, 10.0, 1.0 }
+      vertex{ -10.0, -10.0, -10.0, 1.0 }, // front bottom left
+      vertex{ 10.0, -10.0, -10.0, 1.0 }, // front bottom right
+      vertex{ 10.0, 10.0, -10.0, 1.0 }, // front top right
+      vertex{ -10.0, 10.0, -10.0, 1.0 }, // front top left
+      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4 back bottom left
+      vertex{ 10.0, -10.0, 10.0, 1.0 }, // 5 back bottom right
+      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6 back top right
+      vertex{ -10.0, 10.0, 10.0, 1.0 } // 7 back top left
    },
    // counter-clockwise indices
    std::vector<std::size_t>{
       0, 1, 2, 2, 3, 0, // front
       5, 4, 7, 7, 6, 5, // back 
-      0, 4, 3, 3, 4, 7, // left
-      5, 1, 6, 6, 1, 2, // right
-      3, 2, 7, 7, 2, 6, // top
-      0, 1, 4, 4, 1, 5  // bottom
-      // 4, 5, 6, 6, 7, 4,
-      // 1, 0, 2, 2, 0, 3,
-      // 2, 3, 6, 6, 3, 7,
-      // 6, 7, 5, 5, 7, 4,
-      // 5, 4, 1, 1, 4, 0,
-      // 0, 4, 3, 3, 4, 7,
+      // left, counter-clockwise
+      0, 3, 4, 4, 3, 7,
+      // right, counter-clockwise
+      1, 5, 2, 2, 5, 6,
+      // top, counter-clockwise
+      3, 2, 7, 7, 2, 6,
+      // bottom, counter-clockwise
+      0, 4, 1, 1, 4, 5
    }
 };
 
@@ -139,33 +137,33 @@ int main() {
    // if (std::get<2>(clipped))
    //    transform_tri(*std::get<2>(clipped), p4, p5, p6);
 
+   auto render_tex = LoadRenderTexture(width, height);
          
    int avg_time = 0;
    std::array<matrix, 1> instances{ matrix::identity() };
    float fAngle = 0.0f;
    while (!WindowShouldClose()) {
+      screen.clear();
+      instances[0] = matrix::translate(0.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
+
+      //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
+      //draw_triangle(p1, p2, p3);
+      auto start = std::chrono::steady_clock::now();
+      // fps::rendering::draw_line(screen, p1[0], p1[1], p2[0], p2[1], RED);
+      // fps::rendering::draw_line(screen, p2[0], p2[1], p3[0], p3[1], RED);
+      // fps::rendering::draw_line(screen, p3[0], p3[1], p1[0], p1[1], RED);
+
+      //fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, RED, RED, true);
+      //fps::rendering::draw_triangle(screen, p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], BLUE, BLUE, BLUE, true);
+      renderer.render_model(0, instances); 
+      auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
+      avg_time += dur.count();
+      if (avg_time > 0)
+         avg_time /= 2;
+      UpdateTexture(tex, screen.buffer());
       BeginDrawing();
          ClearBackground(BLACK);
-         screen.clear();
-         instances[0] = matrix::translate(0.0f, 0.0f, -30.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
-
-         //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
-         //draw_triangle(p1, p2, p3);
-         auto start = std::chrono::steady_clock::now();
-         // fps::rendering::draw_line(screen, p1[0], p1[1], p2[0], p2[1], RED);
-         // fps::rendering::draw_line(screen, p2[0], p2[1], p3[0], p3[1], RED);
-         // fps::rendering::draw_line(screen, p3[0], p3[1], p1[0], p1[1], RED);
-
-         //fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, RED, RED, true);
-         //fps::rendering::draw_triangle(screen, p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], BLUE, BLUE, BLUE, true);
-         renderer.render_model(0, instances); 
-         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
-         avg_time += dur.count();
-         if (avg_time > 0)
-            avg_time /= 2;
-         UpdateTexture(tex, screen.buffer());
          DrawTexture(tex, 0, 0, WHITE);
-         //fps::rendering::draw_triangle(400, 600, 300, 500, 500, 300, GREEN);
       EndDrawing();
       fAngle += 0.01f;
       fAngle = std::fmod(fAngle, 2.0f * std::numbers::pi_v<float>);

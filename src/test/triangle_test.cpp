@@ -29,6 +29,32 @@ TEST(TriangleTest, Clipping) {
 TEST(TriangleTest, NormalTest) {
    using namespace fps::math;
 
+   auto vertices = std::vector<fps::math::vertex>{
+      vertex{ -10.0, -10.0, -10.0, 1.0 },
+      vertex{ 10.0, -10.0, -10.0, 1.0 },
+      vertex{ 10.0, 10.0, -10.0, 1.0 },
+      vertex{ -10.0, 10.0, -10.0, 1.0 },
+      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4
+      vertex{ 10.0, -10.0, 10.0, 1.0 },
+      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6
+      vertex{ -10.0, 10.0, 10.0, 1.0 }
+   };
+   // counter-clockwise indices
+   auto indices = std::vector<std::size_t>{
+      0, 1, 2, 2, 3, 0, // front
+      5, 4, 7, 7, 6, 5, // back 
+      0, 4, 3, 3, 4, 7, // left
+      5, 1, 6, 6, 1, 2, // right
+      3, 7, 2, 2, 7, 6, // top
+      0, 1, 4, 4, 1, 5 // bottom
+      // 4, 5, 6, 6, 7, 4,
+      // 1, 0, 2, 2, 0, 3,
+      // 2, 3, 6, 6, 3, 7,
+      // 6, 7, 5, 5, 7, 4,
+      // 5, 4, 1, 1, 4, 0,
+      // 0, 4, 3, 3, 4, 7,
+   };
+
    triangle tr{ vec3f{ -0.5f, 0.0f, 0.0f }, vec3f{ 0.5f, 0.0f, 0.0f }, vec3f{ 0.0f, 1.0f, 0.0f } };
    auto n = tr.normal();
    auto expected = vec3f{ 0.0f, 0.0f, 1.0f };
@@ -38,4 +64,73 @@ TEST(TriangleTest, NormalTest) {
    n = tr2.normal();
    expected = vec3f{ 0.0f, 0.0f, -1.0f };
    EXPECT_EQ(n, expected);
+
+   triangle front1{ vertices[0], vertices[1], vertices[2] };
+   n = front1.normal();
+   expected = vec3f{ 0.0f, 0.0f, 1.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle front2{ vertices[2], vertices[3], vertices[0] };
+   n = front2.normal();
+   expected = vec3f{ 0.0f, 0.0f, 1.0f };
+   EXPECT_EQ(n, expected);
+
+   // check the other 5 faces of the cube
+   triangle back1{ vertices[5], vertices[4], vertices[7] };
+   n = back1.normal();
+   expected = vec3f{ 0.0f, 0.0f, -1.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle back2{ vertices[7], vertices[6], vertices[5] };
+   n = back2.normal();
+   expected = vec3f{ 0.0f, 0.0f, -1.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle left1{ vertices[0], vertices[4], vertices[3] };
+   n = left1.normal();
+   expected = vec3f{ -1.0f, 0.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle left2{ vertices[3], vertices[4], vertices[7] };
+   n = left2.normal();
+   expected = vec3f{ -1.0f, 0.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle right1{ vertices[5], vertices[1], vertices[6] };
+   n = right1.normal();
+   expected = vec3f{ 1.0f, 0.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle right2{ vertices[6], vertices[1], vertices[2] };
+   n = right2.normal();
+   expected = vec3f{ 1.0f, 0.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle top1{ vertices[3], vertices[7], vertices[2] };
+   n = top1.normal();
+   expected = vec3f{ 0.0f, 1.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle top2{ vertices[2], vertices[7], vertices[6] };
+   n = top2.normal();
+   expected = vec3f{ 0.0f, 1.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle bottom1{ vertices[0], vertices[1], vertices[4] };
+   n = bottom1.normal();
+   expected = vec3f{ 0.0f, -1.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+
+   triangle bottom2{ vertices[4], vertices[1], vertices[5] };
+   n = bottom2.normal();
+   expected = vec3f{ 0.0f, -1.0f, 0.0f };
+   EXPECT_EQ(n, expected);
+   
+   triangle misc{ vec3{ 10.0f, -10.0f, 10.0f }, vec3{ 10.0f, -10.0f, -10.0f }, vec3{ -10.0f, 10.0f, -10.0f } };
+   n = misc.normal();
+   expected = vec3f{ 0.707107f, 0.707107f, 0.0f };
+   std::cout << "Misc normal: " << n[0] << ' ' << n[1] << ' ' << n[2] << '\n';   
+   std::cout << "Expected normal: " << expected[0] << ' ' << expected[1] << ' ' << expected[2] << '\n';
+   EXPECT_EQ(n, expected);
+
 }

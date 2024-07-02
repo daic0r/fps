@@ -21,6 +21,15 @@ namespace fps::rendering {
             triangle<vec4, float> tri{ v0, v1, v2 };
             tri.transform(view_matrix_ * model_matrix);
             // TODO: Hidden surface detection goes here
+            auto the_normal = tri.normal();
+            const auto fIncidence = the_normal.dot(tri[0]);
+            if (fIncidence < 0.0f) {
+               continue;
+            }
+            Color color = WHITE;
+            color.r = fIncidence * 255;
+            color.g = fIncidence * 255;
+            color.b = fIncidence * 255;
 
             // Projection
             tri.transform(projection_matrix_);
@@ -84,7 +93,7 @@ namespace fps::rendering {
                // assert(triangle[0][0] >= 0.0f and triangle[0][0] <= renderbuffer_.width() and triangle[0][1] >= 0.0f and triangle[0][1] <= renderbuffer_.height());
                // assert(triangle[1][0] >= 0.0f and triangle[1][0] <= renderbuffer_.width() and triangle[1][1] >= 0.0f and triangle[1][1] <= renderbuffer_.height());
                // assert(triangle[2][0] >= 0.0f and triangle[2][0] <= renderbuffer_.width() and triangle[2][1] >= 0.0f and triangle[2][1] <= renderbuffer_.height());
-               draw_triangle(renderbuffer_, triangle[0][0], triangle[0][1], triangle[1][0], triangle[1][1], triangle[2][0], triangle[2][1], WHITE, WHITE, WHITE, false);
+               draw_triangle(renderbuffer_, triangle[0][0], triangle[0][1], triangle[1][0], triangle[1][1], triangle[2][0], triangle[2][1], color, color, color, true);
             }
 done:
          }

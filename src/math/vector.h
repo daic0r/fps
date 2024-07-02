@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include "utils.h"
 #include <cmath>
 #include <execution>
 #include <iostream>
@@ -113,7 +114,7 @@ namespace fps::math {
       __attribute__((always_inline))
       constexpr bool operator==(Derived const& rhs) const noexcept {
          for (std::size_t i = 0; i < N; ++i) {
-            if (data_[i] != rhs.data_[i]) {
+            if (not fps::math::test_equal(data_[i], rhs.data_[i], 0.000001f)) {
                return false;
             }
          }
