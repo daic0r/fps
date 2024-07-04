@@ -2,7 +2,6 @@
 #include <cstring>
 #include <iostream>
 #include <numbers>
-#include <raylib.h>
 #include <array>
 #include <cmath>
 #include "rendering/utils.h"
@@ -13,6 +12,7 @@
 #include "math/clipping.h"
 #include "rendering/master_renderer.h"
 #include "rendering/model.h"
+#include <SDL2/SDL.h>
 
 using namespace fps::math;
 
@@ -28,37 +28,58 @@ const std::array<fps::math::vec4f, 3> ar_triangle = {
 
 const auto cube = fps::rendering::model {
    std::vector<fps::math::vertex>{
-      vertex{ -10.0, -10.0, -10.0, 1.0 }, // front bottom left
-      vertex{ 10.0, -10.0, -10.0, 1.0 }, // front bottom right
-      vertex{ 10.0, 10.0, -10.0, 1.0 }, // front top right
-      vertex{ -10.0, 10.0, -10.0, 1.0 }, // front top left
-      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4 back bottom left
-      vertex{ 10.0, -10.0, 10.0, 1.0 }, // 5 back bottom right
-      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6 back top right
-      vertex{ -10.0, 10.0, 10.0, 1.0 } // 7 back top left
+      vertex{ -10.0, -10.0, -10.0, 1.0 }, // back bottom left
+      vertex{ 10.0, -10.0, -10.0, 1.0 }, // back bottom right
+      vertex{ 10.0, 10.0, -10.0, 1.0 }, // back top right
+      vertex{ -10.0, 10.0, -10.0, 1.0 }, // back top left
+      vertex{ -10.0, -10.0, 10.0, 1.0 }, // 4 front bottom left
+      vertex{ 10.0, -10.0, 10.0, 1.0 }, // 5 front bottom right
+      vertex{ 10.0, 10.0, 10.0, 1.0 }, // 6 front top right
+      vertex{ -10.0, 10.0, 10.0, 1.0 } // 7 front top left
    },
-   // counter-clockwise indices
    std::vector<std::size_t>{
-      0, 1, 2, 2, 3, 0, // front
-      5, 4, 7, 7, 6, 5, // back 
-      // left, counter-clockwise
-      0, 3, 4, 4, 3, 7,
-      // right, counter-clockwise
-      1, 5, 2, 2, 5, 6,
-      // top, counter-clockwise
-      3, 2, 7, 7, 2, 6,
-      // bottom, counter-clockwise
-      0, 4, 1, 1, 4, 5
+      // counter-clockwise indices
+      // right-handed system
+      // negative z-axis is into the screen
+      1, 0, 3, 3, 2, 1, // back
+      4, 5, 6, 6, 7, 4, // front
+      0, 4, 7, 7, 3, 0, // left
+      5, 1, 2, 2, 6, 5, // right
+      3, 7, 6, 6, 2, 3, // top
+      0, 1, 5, 5, 4, 0 // bottom
    }
 };
+
+void check_normals() {
+   for (int i = 0; i < cube.indices_.size(); i += 6) {
+      auto tri = triangle{ cube.vertices_[cube.indices_[i + 0]], cube.vertices_[cube.indices_[i + 1]], cube.vertices_[cube.indices_[i + 2]] };
+      auto tri2 = triangle{ cube.vertices_[cube.indices_[i + 3]], cube.vertices_[cube.indices_[i + 4]], cube.vertices_[cube.indices_[i + 5]] };
+      auto n = tri.normal();
+      auto n2 = tri2.normal();
+      std::cout << "Normal: " << n[0] << ", " << n[1] << ", " << n[2] << '\n';
+      std::cout << "Normal: " << n2[0] << ", " << n2[1] << ", " << n2[2] << '\n';
+      std::cout << "=====================================================================\n";
+   }
+}
 
 int main() {
 
    const auto width = 800;
    const auto height = 600;
 
-   InitWindow(width, height, "Matrix Test");
-   SetTargetFPS(60);
+   check_normals();
+
+   // InitWindow(width, height, "Matrix Test");
+   // SetTargetFPS(60);
+
+   SDL_Init(SDL_INIT_VIDEO);
+   SDL_Window* window = SDL_CreateWindow("SDL2 Window",
+      SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+
+   SDL_Renderer* sdl_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+   SDL_Texture* texture = SDL_CreateTexture(sdl_renderer,
+      SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+   //SDL_SetRenderTarget(sdl_renderer, texture);
 
    const auto persp = matrix::perspective(std::numbers::pi_v<float> / 4.0f, static_cast<float>(width) / height, 0.1f, 100.0f);
    const auto viewp = matrix::viewport(0, 0, width, height);
@@ -78,10 +99,10 @@ int main() {
       std::cout << '\n';
    }
 
-   Image img = GenImageColor(width, height, BLACK);
-   ImageFormat(&img, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
-   auto tex = LoadTextureFromImage(img);
-   UnloadImage(img);
+   // Image img = GenImageColor(width, height, BLACK);
+   // ImageFormat(&img, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+   // auto tex = LoadTextureFromImage(img);
+   // UnloadImage(img);
    fps::rendering::renderbuffer screen{ width, height };
    std::memset(screen.buffer(), 0, 800*600*4);
 
@@ -137,15 +158,31 @@ int main() {
    // if (std::get<2>(clipped))
    //    transform_tri(*std::get<2>(clipped), p4, p5, p6);
 
-   auto render_tex = LoadRenderTexture(width, height);
+   //auto render_tex = LoadRenderTexture(width, height);
          
    int avg_time = 0;
    std::array<matrix, 1> instances{ matrix::identity() };
    float fAngle = 0.0f;
-   while (!WindowShouldClose()) {
-      screen.clear();
+   SDL_Event event;
+   while (true) {
+      while (SDL_PollEvent(&event)) {
+         if (event.type == SDL_QUIT)
+            goto quit;
+         else if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE)
+               goto quit;
+         }
+
+      }
       instances[0] = matrix::translate(0.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
 
+      void *pixels;
+      int pitch;
+      SDL_LockTexture(texture, NULL, &pixels, &pitch);
+      assert(pixels);
+      assert(pitch == width * 4);
+      screen.set_texture_ptr(static_cast<unsigned char*>(pixels));
+      screen.clear();
       //DrawTriangle(Vector2{ p1[0], p1[1] }, Vector2{ p2[0], p2[1] }, Vector2{ p3[0], p3[1] }, RED);
       //draw_triangle(p1, p2, p3);
       auto start = std::chrono::steady_clock::now();
@@ -160,17 +197,27 @@ int main() {
       avg_time += dur.count();
       if (avg_time > 0)
          avg_time /= 2;
-      UpdateTexture(tex, screen.buffer());
-      BeginDrawing();
-         ClearBackground(BLACK);
-         DrawTexture(tex, 0, 0, WHITE);
-      EndDrawing();
+      // UpdateTexture(tex, screen.buffer());
+      //SDL_UpdateTexture(texture, NULL, screen.buffer(), width * 4);
+      SDL_UnlockTexture(texture);
+      //SDL_RenderClear(sdl_renderer);
+      SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
+      SDL_RenderPresent(sdl_renderer);
+      // BeginDrawing();
+      //    ClearBackground(BLACK);
+      //    DrawTexture(tex, 0, 0, WHITE);
+      // EndDrawing();
       fAngle += 0.01f;
       fAngle = std::fmod(fAngle, 2.0f * std::numbers::pi_v<float>);
    }
+quit:
 
-   UnloadTexture(tex);
-   CloseWindow();
+   SDL_DestroyTexture(texture);
+   SDL_DestroyRenderer(sdl_renderer);
+   SDL_DestroyWindow(window);
+   SDL_Quit();
+   // UnloadTexture(tex);
+   // CloseWindow();
 
    std::cout << "Triangle drawing took on average " << avg_time << "ns" << std::endl;
 

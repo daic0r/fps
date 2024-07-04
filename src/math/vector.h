@@ -94,6 +94,15 @@ namespace fps::math {
          return result;
       }
       __attribute__((always_inline))
+      constexpr auto operator-() const noexcept {
+         Derived result{};
+         // std::transform(std::execution::par_unseq, data_.begin(), data_.end(), result.data_.begin(), std::negate{});
+         for (std::size_t i = 0; i < N; ++i) {
+            result[i] = -data_[i];
+         }
+         return result;
+      }
+      __attribute__((always_inline))
       constexpr NumericType dot(vec const& rhs) const noexcept {
          NumericType result{};
          for (std::size_t i = 0; i < N; ++i) {

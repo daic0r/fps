@@ -69,6 +69,7 @@ namespace fps::math {
          ret[0,3] = w2 - 0.5f + x;
          ret[1,1] = -h2 + 0.5f;
          ret[1,3] = h2 - 0.5f + y;
+         ret[2,2] = 1.0f;
          return ret;
       }
       static constexpr matrix identity() noexcept {

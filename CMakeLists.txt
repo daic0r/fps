@@ -17,9 +17,15 @@ if (ASAN)
    string(APPEND CMAKE_LINKER_FLAGS_DEBUG " -fno-omit-frame-pointer -fsanitize=address")
 endif()
    
+find_package(SDL2 REQUIRED)
+#find_file(SDL2_INCLUDE_DIR NAME SDL.h HINTS SDL2)
+#find_library(SDL2_LIBRARY NAME SDL2)
+
 add_subdirectory(src)
 
-target_link_libraries(FPS PRIVATE raylib)
+target_include_directories(FPS PRIVATE ${SDL2_INCLUDE_DIR})
+message(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
+target_link_libraries(FPS PRIVATE raylib SDL2::SDL2main SDL2::SDL2 SDL2::SDL2-static)
 target_precompile_headers(FPS PRIVATE src/precompiled.h)
 
 include(FetchContent)

@@ -22,15 +22,17 @@ namespace fps::rendering {
             tri.transform(view_matrix_ * model_matrix);
             // TODO: Hidden surface detection goes here
             auto the_normal = tri.normal();
-            const auto fIncidence = the_normal.dot(tri[0]);
-            if (fIncidence < 0.0f) {
+            const auto fIncidence = the_normal.dot(vec3f{ 0.0f, 0.0f, 1.0f });
+            if (fIncidence <= 0.0f) {
                continue;
             }
-            Color color = WHITE;
-            color.r = fIncidence * 255;
-            color.g = fIncidence * 255;
-            color.b = fIncidence * 255;
 
+            Color color = WHITE;
+            color.r = static_cast<unsigned char>(fIncidence * 255.0f);
+            color.g = static_cast<unsigned char>(fIncidence * 255.0f);
+            color.b = static_cast<unsigned char>(fIncidence * 255.0f);
+            color.a = 255;
+               
             // Projection
             tri.transform(projection_matrix_);
 
@@ -60,17 +62,21 @@ namespace fps::rendering {
                      assert(test_equal((*one)[0][3], 1.0f));
                      assert(test_equal((*one)[1][3], 1.0f));
                      assert(test_equal((*one)[2][3], 1.0f));
+                     assert(the_normal ==  one->normal());
                      *iter = *one;
                      if (two) {
                         assert(test_equal((*two)[0][3], 1.0f));
                         assert(test_equal((*two)[1][3], 1.0f));
                         assert(test_equal((*two)[2][3], 1.0f));
+                        assert(the_normal ==  two->normal());
                         iter = clip_triangles_.insert_after(iter, *two);
                      }
                   }
                   ++iter;
                }
             }
+
+            assert(the_normal[2] > 0.0f);
 
             // into screenspace
             for (auto& triangle : clip_triangles_) {
@@ -90,10 +96,11 @@ namespace fps::rendering {
                assert((int)triangle[1][0] >= 0 and (int)triangle[1][0] < renderbuffer_.width() and (int)triangle[1][1] >= 0 and (int)triangle[1][1] < renderbuffer_.height());
                assert((int)triangle[2][0] >= 0 and (int)triangle[2][0] < renderbuffer_.width() and (int)triangle[2][1] >= 0 and (int)triangle[2][1] < renderbuffer_.height());
 
+
                // assert(triangle[0][0] >= 0.0f and triangle[0][0] <= renderbuffer_.width() and triangle[0][1] >= 0.0f and triangle[0][1] <= renderbuffer_.height());
                // assert(triangle[1][0] >= 0.0f and triangle[1][0] <= renderbuffer_.width() and triangle[1][1] >= 0.0f and triangle[1][1] <= renderbuffer_.height());
                // assert(triangle[2][0] >= 0.0f and triangle[2][0] <= renderbuffer_.width() and triangle[2][1] >= 0.0f and triangle[2][1] <= renderbuffer_.height());
-               draw_triangle(renderbuffer_, triangle[0][0], triangle[0][1], triangle[1][0], triangle[1][1], triangle[2][0], triangle[2][1], color, color, color, true);
+               renderbuffer_.draw_triangle(triangle[0][0], triangle[0][1], triangle[0][2], triangle[1][0], triangle[1][1], triangle[1][2], triangle[2][0], triangle[2][1], triangle[2][2], color, color, color, true);
             }
 done:
          }
