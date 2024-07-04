@@ -133,4 +133,21 @@ TEST(TriangleTest, NormalTest) {
    std::cout << "Expected normal: " << expected[0] << ' ' << expected[1] << ' ' << expected[2] << '\n';
    EXPECT_EQ(n, expected);
 
+   vec4f p1{-1.00297916, -0.214191183, 0.99873811, 1}; 
+   vec4f p2{-0.482353061, -0.407408953, 0.998453021, 1}; 
+   vec4f p3{-0.307203919, 0.389778435, 0.998638988, 1};
+
+   triangle t{ p1, p2, p3 };
+
+   vec4f p4{-1, -0.215296835, 0.998736501, 1};
+   vec4f p5{-0.482353061, -0.407408953, 0.998453021, 1};
+   vec4f p6{-0.307203919, 0.389778435, 0.998638988, 1};
+   
+   triangle t2{ p4, p5, p6 };
+   
+   auto n1 = t.normal();
+   auto n2 = t2.normal();
+   std::cout << "Normal: " << n1[0] << ", " << n1[1] << ", " << n1[2] << '\n';
+   std::cout << "Normal: " << n2[0] << ", " << n2[1] << ", " << n2[2] << '\n';
+   EXPECT_EQ(n1, n2);
 }

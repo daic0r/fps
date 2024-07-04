@@ -42,11 +42,25 @@ TEST(MatrixTests, PerspectiveMatrix) {
       0.000000f, 0.000000f, -1.000000f, 0.000000f
    };
    // print it
-   for (auto i = 0; i < 4; ++i) {
-      for (auto j = 0; j < 4; ++j) {
-         std::cout << m[i,j] << ' ';
-      }
-      std::cout << '\n';
-   }
+   // for (auto i = 0; i < 4; ++i) {
+   //    for (auto j = 0; j < 4; ++j) {
+   //       std::cout << m[i,j] << ' ';
+   //    }
+   //    std::cout << '\n';
+   // }
+   EXPECT_EQ(m, expected);
+}
+
+TEST(MatrixTests, ViewportMatrix) {
+   using namespace fps::math;
+
+   auto m = matrix::viewport(0, 0, 800, 600);
+
+   matrix expected = {
+      399.5f, 0.0f, 0.0f, 399.5f,
+      0.0f, -299.5f, 0.0f, 299.5f,
+      0.0f, 0.0f, 1.0f, 0.0f,
+      0.0f, 0.0f, 0.0f, 0.0f
+   };
    EXPECT_EQ(m, expected);
 }

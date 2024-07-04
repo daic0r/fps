@@ -48,10 +48,12 @@ namespace fps::math {
       constexpr NumericType& operator[](std::size_t index) noexcept {
          return data_[index];
       }
+
       __attribute__((always_inline))
       constexpr NumericType const& operator[](std::size_t index) const noexcept {
          return data_[index];
       }
+
       __attribute__((always_inline))
       constexpr auto operator+(Derived const& rhs) const noexcept {
          Derived result{};
@@ -61,6 +63,7 @@ namespace fps::math {
          }
          return result;
       }
+
       __attribute__((always_inline))
       constexpr auto operator-(Derived const& rhs) const noexcept {
          Derived result{};
@@ -70,6 +73,7 @@ namespace fps::math {
          }
          return result;
       }
+
       __attribute__((always_inline))
       constexpr auto operator*(NumericType scalar) const noexcept {
          Derived result{};
@@ -81,6 +85,7 @@ namespace fps::math {
          }
          return result;
       }
+
       __attribute__((always_inline))
       constexpr auto operator/(NumericType scalar) const noexcept {
          Derived result{};
@@ -93,6 +98,7 @@ namespace fps::math {
          }
          return result;
       }
+
       __attribute__((always_inline))
       constexpr auto operator-() const noexcept {
          Derived result{};
@@ -102,6 +108,7 @@ namespace fps::math {
          }
          return result;
       }
+
       __attribute__((always_inline))
       constexpr NumericType dot(vec const& rhs) const noexcept {
          NumericType result{};
@@ -112,14 +119,22 @@ namespace fps::math {
          // return std::inner_product(
          //       data_.begin(), data_.end(), rhs.data_.begin(), NumericType{});
       }
+
+      __attribute__((always_inline))
+      constexpr auto operator*(Derived const& rhs) const noexcept {
+         return dot(rhs);
+      }
+
       __attribute__((always_inline))
       constexpr NumericType length() const noexcept {
          return std::sqrt(dot(*this));
       }
+
       __attribute__((always_inline))
       constexpr auto normalize() const noexcept {
          return Derived{ *this / length() };
       }
+
       __attribute__((always_inline))
       constexpr bool operator==(Derived const& rhs) const noexcept {
          for (std::size_t i = 0; i < N; ++i) {
@@ -129,6 +144,7 @@ namespace fps::math {
          }
          return true;
       }
+
       __attribute__((always_inline))
       constexpr void clamp(NumericType min, NumericType max) noexcept {
          for (std::size_t i = 0; i < N; ++i) {
@@ -156,7 +172,6 @@ namespace fps::math {
    struct vec3 : vec<vec3<NumericType>, 3, NumericType> {
       using base = vec<vec3<NumericType>, 3, NumericType>;
       using base::base;
-      using base::operator==;
 
       constexpr vec3() = default;
       __attribute__((always_inline))

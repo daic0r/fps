@@ -161,7 +161,7 @@ int main() {
    //auto render_tex = LoadRenderTexture(width, height);
          
    int avg_time = 0;
-   std::array<matrix, 1> instances{ matrix::identity() };
+   std::array<matrix, 2> instances{ matrix::identity() };
    float fAngle = 0.0f;
    SDL_Event event;
    while (true) {
@@ -174,7 +174,8 @@ int main() {
          }
 
       }
-      instances[0] = matrix::translate(0.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
+      instances[0] = matrix::translate(-15.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
+      instances[1] = matrix::translate(10.0f, 0.0f, -40.0f) * matrix::rotate_y(-fAngle) * matrix::rotate_x(-fAngle) * matrix::rotate_z(-fAngle);
 
       void *pixels;
       int pitch;

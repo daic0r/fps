@@ -10,18 +10,20 @@
 namespace fps::math {
    template<typename T>
       requires std::is_arithmetic_v<T>
-   constexpr bool test_equal(T a, T b, T epsilon = std::numeric_limits<T>::epsilon()) {
-      return std::abs(a - b) < epsilon;
+   constexpr bool test_equal(T a, T b, T epsilon = std::numeric_limits<T>::epsilon(), T relEpsilon = 1e-8) {
+      if (std::abs(a - b) <= epsilon)
+         return true;
+      return std::abs(a - b) <= std::max(std::abs(a), std::abs(b)) * relEpsilon;
    }
 
    template<typename T>
       requires std::is_arithmetic_v<T>
    constexpr T sgn(T x) noexcept {
       if (x < 0.0f)
-         return -1.0f;
+         return T{-1};
       if (x > 0.0f)
-         return 1.0f;
-      return 0.0f;
+         return T{1};
+      return T{0};
    }
 
    template<typename T>

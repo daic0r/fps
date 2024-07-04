@@ -6,20 +6,26 @@
 #include "utils.h"
 
 namespace fps::math {
-   class matrix {
-      std::array<std::array<float, 4>, 4> m_data{};
+   template<typename NumericType>
+   class basic_matrix {
+      static constexpr inline auto Zero = NumericType{ 0 };
+      static constexpr inline auto One = NumericType{ 1 };
+      static constexpr inline auto Two = NumericType{ 2 };
+      static constexpr inline auto Half = NumericType{ 0.5 };
+
+      std::array<std::array<NumericType, 4>, 4> m_data{};
 
    public:
-      constexpr matrix() = default;
-      constexpr matrix(float m00, float m01, float m02, float m03,
-            float m10, float m11, float m12, float m13,
-            float m20, float m21, float m22, float m23,
-            float m30, float m31, float m32, float m33) :
+      constexpr basic_matrix() = default;
+      constexpr basic_matrix(NumericType m00, NumericType m01, NumericType m02, NumericType m03,
+            NumericType m10, NumericType m11, NumericType m12, NumericType m13,
+            NumericType m20, NumericType m21, NumericType m22, NumericType m23,
+            NumericType m30, NumericType m31, NumericType m32, NumericType m33) :
          m_data{
-            std::array<float, 4>{m00, m01, m02, m03},
-            std::array<float, 4>{m10, m11, m12, m13},
-            std::array<float, 4>{m20, m21, m22, m23},
-            std::array<float, 4>{m30, m31, m32, m33}
+            std::array<NumericType, 4>{m00, m01, m02, m03},
+            std::array<NumericType, 4>{m10, m11, m12, m13},
+            std::array<NumericType, 4>{m20, m21, m22, m23},
+            std::array<NumericType, 4>{m30, m31, m32, m33}
          } {}
 
       constexpr decltype(auto) operator[](std::size_t row, std::size_t col) {
@@ -31,8 +37,8 @@ namespace fps::math {
       }
 
 
-      constexpr vec4f operator*(const vec4f& v) const {
-         return vec4f{
+      constexpr vec4<NumericType> operator*(const vec4<NumericType>& v) const {
+         return vec4<NumericType>{
             m_data[0][0] * v[0] + m_data[0][1] * v[1] + m_data[0][2] * v[2] + m_data[0][3] * v[3],
             m_data[1][0] * v[0] + m_data[1][1] * v[1] + m_data[1][2] * v[2] + m_data[1][3] * v[3],
             m_data[2][0] * v[0] + m_data[2][1] * v[1] + m_data[2][2] * v[2] + m_data[2][3] * v[3],
@@ -40,8 +46,8 @@ namespace fps::math {
          };
       }
 
-      constexpr matrix operator*(const matrix& m) const {
-         matrix result{};
+      constexpr basic_matrix operator*(const basic_matrix& m) const {
+         basic_matrix result{};
          for (std::size_t i = 0; i < 4; ++i) {
             for (std::size_t j = 0; j < 4; ++j) {
                result[i,j] = m_data[i][0] * m[0,j] + m_data[i][1] * m[1,j] + m_data[i][2] * m[2,j] + m_data[i][3] * m[3,j];
@@ -50,66 +56,66 @@ namespace fps::math {
          return result;
       }
 
-      static constexpr matrix perspective(float fovV, float fAspectRatio, float fNear, float fFar) {
-         const auto fov2 = fovV * 0.5f;
+      static constexpr basic_matrix perspective(NumericType fovV, NumericType fAspectRatio, NumericType fNear, NumericType fFar) {
+         const auto fov2 = fovV * Half;
          const auto denom = fNear - fFar;
-         matrix ret{};
-         ret[0,0] = 1.0f / (tanf(fov2) * fAspectRatio);
-         ret[1,1] = 1.0f / tanf(fov2);
+         basic_matrix ret{};
+         ret[0,0] = One / (tanf(fov2) * fAspectRatio);
+         ret[1,1] = One / tanf(fov2);
          ret[2,2] = (fNear + fFar) / denom;
-         ret[2,3] = (2.0f * fNear * fFar) / denom;
-         ret[3,2] = -1.0f;
+         ret[2,3] = (Two * fNear * fFar) / denom;
+         ret[3,2] = -One;
          return ret;
       }
-      static constexpr matrix viewport(int x, int y, int width, int height) {
-         matrix ret{};
-         const auto w2 = 0.5f * width;
-         const auto h2 = 0.5f * height;
-         ret[0,0] = w2 - 0.5f;
-         ret[0,3] = w2 - 0.5f + x;
-         ret[1,1] = -h2 + 0.5f;
-         ret[1,3] = h2 - 0.5f + y;
-         ret[2,2] = 1.0f;
+      static constexpr basic_matrix viewport(int x, int y, int width, int height) {
+         basic_matrix ret{};
+         const auto w2 = Half * width;
+         const auto h2 = Half * height;
+         ret[0,0] = w2 - Half;
+         ret[0,3] = w2 - Half + x;
+         ret[1,1] = -h2 + Half;
+         ret[1,3] = h2 - Half + y;
+         ret[2,2] = One;
          return ret;
       }
-      static constexpr matrix identity() noexcept {
-         return matrix{ 1.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, 1.0f, 0.0f, 0.0f,
-                        0.0f, 0.0f, 1.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f };
+      static constexpr basic_matrix identity() noexcept {
+         return basic_matrix{ One, Zero, Zero, Zero,
+                        Zero, One, Zero, Zero,
+                        Zero, Zero, One, Zero,
+                        Zero, Zero, Zero, One };
       }
-      static constexpr matrix rotate_x(float angle) noexcept {
+      static constexpr basic_matrix rotate_x(NumericType angle) noexcept {
          const auto s = sinf(angle);
          const auto c = cosf(angle);
-         return matrix{ 1.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, c, s, 0.0f,
-                        0.0f, -s, c, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f };
+         return basic_matrix{ One, Zero, Zero, Zero,
+                        Zero, c, s, Zero,
+                        Zero, -s, c, Zero,
+                        Zero, Zero, Zero, One };
       }
-      static constexpr matrix rotate_y(float angle) noexcept {
+      static constexpr basic_matrix rotate_y(NumericType angle) noexcept {
          const auto s = sinf(angle);
          const auto c = cosf(angle);
-         return matrix{ c, 0.0f, -s, 0.0f,
-                        0.0f, 1.0f, 0.0f, 0.0f,
-                        s, 0.0f, c, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f };
+         return basic_matrix{ c, Zero, -s, Zero,
+                        Zero, One, Zero, Zero,
+                        s, Zero, c, Zero,
+                        Zero, Zero, Zero, One };
       }
-      static constexpr matrix rotate_z(float angle) noexcept {
+      static constexpr basic_matrix rotate_z(NumericType angle) noexcept {
          const auto s = sinf(angle);
          const auto c = cosf(angle);
-         return matrix{ c, s, 0.0f, 0.0f,
-                        -s, c, 0.0f, 0.0f,
-                        0.0f, 0.0f, 1.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f };
+         return basic_matrix{ c, s, Zero, Zero,
+                        -s, c, Zero, Zero,
+                        Zero, Zero, One, Zero,
+                        Zero, Zero, Zero, One };
       }
-      static constexpr matrix translate(float x, float y, float z) noexcept {
-         return matrix{ 1.0f, 0.0f, 0.0f, x,
-                        0.0f, 1.0f, 0.0f, y,
-                        0.0f, 0.0f, 1.0f, z,
-                        0.0f, 0.0f, 0.0f, 1.0f };
+      static constexpr basic_matrix translate(NumericType x, NumericType y, NumericType z) noexcept {
+         return basic_matrix{ One, Zero, Zero, x,
+                        Zero, One, Zero, y,
+                        Zero, Zero, One, z,
+                        Zero, Zero, Zero, One };
       }
 
-      constexpr bool operator==(const matrix& other) const {
+      constexpr bool operator==(const basic_matrix& other) const {
          for (std::size_t i = 0; i < 4; ++i) {
             for (std::size_t j = 0; j < 4; ++j) {
                if (not fps::math::test_equal(m_data[i][j], other[i,j], .00001f)) {
@@ -121,6 +127,8 @@ namespace fps::math {
       }
 
    };
+
+   using matrix = basic_matrix<float>;
 }
 
 #endif // MATRIX_H
