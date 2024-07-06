@@ -42,6 +42,14 @@ namespace fps::math {
                }
             };
          }
+
+         constexpr auto operator*(const vec3<NumericType>& v) const noexcept {
+            return vec3<NumericType>{
+               data_[0][0] * v[0] + data_[0][1] * v[1] + data_[0][2] * v[2],
+               data_[1][0] * v[0] + data_[1][1] * v[1] + data_[1][2] * v[2],
+               data_[2][0] * v[0] + data_[2][1] * v[1] + data_[2][2] * v[2]
+            };
+         }
       };
    }
 

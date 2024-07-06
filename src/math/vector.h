@@ -63,6 +63,14 @@ namespace fps::math {
          }
          return result;
       }
+      __attribute__((always_inline))
+      constexpr auto operator+=(Derived const& rhs) noexcept {
+         //std::transform(std::execution::par_unseq, data_.begin(), data_.end(), rhs.data_.begin(), data_.begin(), std::plus{});
+         for (std::size_t i = 0; i < N; ++i) {
+            data_[i] += rhs[i];
+         }
+         return *this;
+      }
 
       __attribute__((always_inline))
       constexpr auto operator-(Derived const& rhs) const noexcept {
@@ -72,6 +80,14 @@ namespace fps::math {
             result[i] = data_[i] - rhs[i];
          }
          return result;
+      }
+      __attribute__((always_inline))
+      constexpr auto operator-=(Derived const& rhs) noexcept {
+         //std::transform(std::execution::par_unseq, data_.begin(), data_.end(), rhs.data_.begin(), data_.begin(), std::minus{});
+         for (std::size_t i = 0; i < N; ++i) {
+            data_[i] -= rhs[i];
+         }
+         return *this;
       }
 
       __attribute__((always_inline))
@@ -85,6 +101,16 @@ namespace fps::math {
          }
          return result;
       }
+      __attribute__((always_inline))
+      constexpr auto operator*=(NumericType scalar) noexcept {
+         // std::transform(std::execution::par_unseq, data_.begin(), data_.end(), data_.begin(), [scalar](auto const& elem) {
+         //    return elem * scalar;
+         // });
+         for (std::size_t i = 0; i < N; ++i) {
+            data_[i] *= scalar;
+         }
+         return *this;
+      }
 
       __attribute__((always_inline))
       constexpr auto operator/(NumericType scalar) const noexcept {
@@ -97,6 +123,17 @@ namespace fps::math {
             result[i] = data_[i] * fFactor;
          }
          return result;
+      }
+      __attribute__((always_inline))
+      constexpr auto operator/=(NumericType scalar) noexcept {
+         // std::transform(std::execution::par_unseq, data_.begin(), data_.end(), data_.begin(), [scalar](auto const& elem) {
+         //    return elem / scalar;
+         // });
+         const auto fFactor = 1.0f / scalar;
+         for (std::size_t i = 0; i < N; ++i) {
+            data_[i] *= fFactor;
+         }
+         return *this;
       }
 
       __attribute__((always_inline))

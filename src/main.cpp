@@ -13,6 +13,7 @@
 #include "rendering/master_renderer.h"
 #include "rendering/model.h"
 #include <SDL2/SDL.h>
+#include <rendering/fps_camera.h>
 
 using namespace fps::math;
 
@@ -81,7 +82,7 @@ int main() {
       SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
    //SDL_SetRenderTarget(sdl_renderer, texture);
 
-   const auto persp = matrix::perspective(std::numbers::pi_v<float> / 4.0f, static_cast<float>(width) / height, 0.1f, 100.0f);
+   const auto persp = matrix::perspective(std::numbers::pi_v<float> / 4.0f, static_cast<float>(width) / height, 0.1f, 1000.0f);
    const auto viewp = matrix::viewport(0, 0, width, height);
 
    std::cout << "Perspective matrix:\n";
@@ -106,10 +107,12 @@ int main() {
    fps::rendering::renderbuffer screen{ width, height };
    std::memset(screen.buffer(), 0, 800*600*4);
 
+   fps::rendering::fps_camera cam{ vec3f{ 0.0f, 0.0f, 50.0f }, 0.0f, 0.0f };
+
    fps::rendering::master_renderer renderer{ screen };
    renderer.set_projection_matrix(persp);
    renderer.set_viewport_matrix(viewp);
-   renderer.set_view_matrix(matrix::identity());
+   renderer.set_view_matrix(cam.view_matrix());
    renderer.add_model(cube);
 
    auto const transform_tri = [&](const auto& tri, vec4f& p1, vec4f &p2, vec4f &p3) {
@@ -171,8 +174,22 @@ int main() {
          else if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE)
                goto quit;
+            else if (event.key.keysym.sym == SDLK_w)
+               cam.move_forward(1.1f);
+            else if (event.key.keysym.sym == SDLK_s)
+               cam.move_forward(-1.1f);
+            else if (event.key.keysym.sym == SDLK_a)
+               cam.move_right(-1.1f);
+            else if (event.key.keysym.sym == SDLK_d)
+               cam.move_right(1.1f);
          }
-
+         else if (event.type == SDL_MOUSEMOTION) {
+            cam.inc_yaw(event.motion.xrel * 0.01f);
+            cam.inc_pitch(event.motion.yrel * 0.01f);
+         }
+      }
+      if (cam.dirty()) {
+         renderer.set_view_matrix(cam.view_matrix());
       }
       instances[0] = matrix::translate(-15.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
       instances[1] = matrix::translate(10.0f, 0.0f, -40.0f) * matrix::rotate_y(-fAngle) * matrix::rotate_x(-fAngle) * matrix::rotate_z(-fAngle);
