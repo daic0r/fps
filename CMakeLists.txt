@@ -23,7 +23,7 @@ find_package(SDL2 REQUIRED)
 
 add_subdirectory(src)
 
-target_include_directories(FPS PRIVATE ${SDL2_INCLUDE_DIR})
+target_include_directories(FPS PRIVATE ${SDL2_INCLUDE_DIR} src)
 message(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
 target_link_libraries(FPS PRIVATE raylib SDL2::SDL2main SDL2::SDL2 SDL2::SDL2-static)
 target_precompile_headers(FPS PRIVATE src/precompiled.h)
