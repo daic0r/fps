@@ -28,11 +28,11 @@ namespace fps::rendering {
                continue;
             }
 
-            Color color = WHITE;
-            color.r = static_cast<unsigned char>(fIncidence * 255.0f);
-            color.g = static_cast<unsigned char>(fIncidence * 255.0f);
-            color.b = static_cast<unsigned char>(fIncidence * 255.0f);
-            color.a = 255;
+            // Color color = WHITE;
+            // color.r = static_cast<unsigned char>(fIncidence * 255.0f);
+            // color.g = static_cast<unsigned char>(fIncidence * 255.0f);
+            // color.b = static_cast<unsigned char>(fIncidence * 255.0f);
+            // color.a = 255;
 
             // Projection
             tri.transform(projection_matrix_);
@@ -48,14 +48,11 @@ namespace fps::rendering {
                tri[2] = tri[2] / tri[2][3];
             tri[2][3] = 1.0f;
 
-            clip_triangles_.push_front(tri);
+            clip_triangles_.emplace_front(tri, Color{ 255, 255, 255, 255 });
             for (auto const &pln : ndc_planes_) {
                auto iter = clip_triangles_.begin();
                while (iter != clip_triangles_.end()) {
-                  assert(test_equal((*iter)[0][3], 1.0f));
-                  assert(test_equal((*iter)[1][3], 1.0f));
-                  assert(test_equal((*iter)[2][3], 1.0f));
-                  auto const [clipped, one, two] = clip(*iter, pln);
+                  auto const [clipped, one, two] = clip(iter->first, pln);
                   // completely behind plane? -> triangle invisible
                   if (not clipped and not one and not two) {
                      goto done;
@@ -63,12 +60,13 @@ namespace fps::rendering {
                      assert(test_equal((*one)[0][3], 1.0f));
                      assert(test_equal((*one)[1][3], 1.0f));
                      assert(test_equal((*one)[2][3], 1.0f));
-                     *iter = *one;
+                     iter->first = *one;
+                     iter->second = Color{ 255, 0, 0, 255 };
                      if (two) {
                         assert(test_equal((*two)[0][3], 1.0f));
                         assert(test_equal((*two)[1][3], 1.0f));
                         assert(test_equal((*two)[2][3], 1.0f));
-                        iter = clip_triangles_.insert_after(iter, *two);
+                        iter = clip_triangles_.emplace_after(iter, *two, Color{ 0, 255, 0, 255 });
                      }
                   }
                   ++iter;
@@ -78,7 +76,7 @@ namespace fps::rendering {
             //assert(the_normal[2] > 0.0f);
 
             // into screenspace
-            for (auto &triangle : clip_triangles_) {
+            for (auto &[triangle, color] : clip_triangles_) {
                triangle.clamp_all_vertices(-1.0f, 1.0f);
 
                triangle.transform(viewport_matrix_);
@@ -129,7 +127,7 @@ namespace fps::rendering {
                renderbuffer_.draw_triangle(
                      triangle[0][0], triangle[0][1], triangle[0][2], triangle[1][0],
                      triangle[1][1], triangle[1][2], triangle[2][0], triangle[2][1],
-                     triangle[2][2], color, color, color, true);
+                     triangle[2][2], color * fIncidence, color * fIncidence, color * fIncidence, true);
             }
 done:
          }
