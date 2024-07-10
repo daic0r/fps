@@ -20,22 +20,17 @@ namespace fps::rendering {
             auto const &v2 = model.vertices_[model.indices_[i + 2]];
 
             triangle<vec4, float> tri{v0, v1, v2};
-            tri.transform(view_matrix_ * model_matrix);
-            // TODO: Hidden surface detection goes here
-            auto the_normal = tri.normal();
-            const auto fIncidence = the_normal.dot(vec3f{0.0f, 0.0f, 1.0f});
-            if (fIncidence <= 0.0f) {
+            auto const ret = model.vertex_shader_->run(tri, model_matrix, view_matrix_, projection_matrix_);
+            if (not ret.has_value()) {
                continue;
             }
+            tri = ret->triangle;
 
             // Color color = WHITE;
             // color.r = static_cast<unsigned char>(fIncidence * 255.0f);
             // color.g = static_cast<unsigned char>(fIncidence * 255.0f);
             // color.b = static_cast<unsigned char>(fIncidence * 255.0f);
             // color.a = 255;
-
-            // Projection
-            tri.transform(projection_matrix_);
 
             // Perspective divide
             if (not test_equal(tri[0][3], 0.0f))
@@ -127,7 +122,7 @@ namespace fps::rendering {
                renderbuffer_.draw_triangle(
                      triangle[0][0], triangle[0][1], triangle[0][2], triangle[1][0],
                      triangle[1][1], triangle[1][2], triangle[2][0], triangle[2][1],
-                     triangle[2][2], color * fIncidence, color * fIncidence, color * fIncidence, true);
+                     triangle[2][2], color * ret->fIncidence, color * ret->fIncidence, color * ret->fIncidence, true);
             }
 done:
          }

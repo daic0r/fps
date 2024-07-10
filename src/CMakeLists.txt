@@ -3,4 +3,6 @@ add_executable(${PROJECT_NAME}
    rendering/utils.cpp 
    rendering/master_renderer.cpp
    rendering/renderbuffer.cpp
+   shaders/model_vertexshader.cpp
+   importers/ModelImporterOBJ.cpp
 )

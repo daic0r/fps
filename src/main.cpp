@@ -12,8 +12,10 @@
 #include "math/clipping.h"
 #include "rendering/master_renderer.h"
 #include "rendering/model.h"
+#include "shaders/model_vertexshader.h"
 #include <SDL2/SDL.h>
 #include <rendering/fps_camera.h>
+#include <importers/ModelImporterOBJ.h>
 
 using namespace fps::math;
 
@@ -27,7 +29,7 @@ const std::array<fps::math::vec4f, 3> ar_triangle = {
    vec4f{ 0.0, 10.0, -40.0, 1.0 }
 };
 
-const auto cube = fps::rendering::model {
+auto cube = fps::rendering::model {
    std::vector<fps::math::vertex>{
       vertex{ -10.0, -10.0, -10.0, 1.0 }, // back bottom left
       vertex{ 10.0, -10.0, -10.0, 1.0 }, // back bottom right
@@ -64,6 +66,13 @@ void check_normals() {
 }
 
 int main() {
+   std::map<std::string, fps::rendering::model> models;
+   fps::importers::ModelImporterOBJ importer{ "assets/VideoShip.obj" };
+   if (importer.import(models)) {
+      std::cout << "Imported " << models.size() << " models\n";
+   } else {
+      std::cout << "Failed to import models\n";
+   }
 
    const auto width = 800;
    const auto height = 600;
@@ -108,12 +117,16 @@ int main() {
    std::memset(screen.buffer(), 0, 800*600*4);
 
    fps::rendering::fps_camera cam{ vec3f{ 0.0f, 0.0f, 50.0f }, 0.0f, 0.0f };
+   
+   cube.vertex_shader_ = std::make_unique<fps::rendering::model_vertexshader>();
+   models["VideoShip"].vertex_shader_ = std::make_unique<fps::rendering::model_vertexshader>();
 
    fps::rendering::master_renderer renderer{ screen };
    renderer.set_projection_matrix(persp);
    renderer.set_viewport_matrix(viewp);
    renderer.set_view_matrix(cam.view_matrix());
-   renderer.add_model(cube);
+   renderer.add_model(std::move(cube));
+   renderer.add_model(std::move(models["VideoShip"]));
 
    auto const transform_tri = [&](const auto& tri, vec4f& p1, vec4f &p2, vec4f &p3) {
       std::cout << "Triangle verticesz:\n";
@@ -164,7 +177,8 @@ int main() {
    //auto render_tex = LoadRenderTexture(width, height);
          
    int avg_time = 0;
-   std::array<matrix, 2> instances{ matrix::identity() };
+   std::array<matrix, 1> instances{ matrix::identity() };
+   std::array<matrix, 1> instances2{ matrix::identity() };
    float fAngle = 0.0f;
    SDL_Event event;
    while (true) {
@@ -192,7 +206,7 @@ int main() {
          renderer.set_view_matrix(cam.view_matrix());
       }
       instances[0] = matrix::translate(-15.0f, 0.0f, -50.0f) * matrix::rotate_y(fAngle) * matrix::rotate_x(fAngle) * matrix::rotate_z(fAngle);
-      instances[1] = matrix::translate(10.0f, 0.0f, -40.0f) * matrix::rotate_y(-fAngle) * matrix::rotate_x(-fAngle) * matrix::rotate_z(-fAngle);
+      instances2[0] = matrix::translate(10.0f, 0.0f, -40.0f) * matrix::rotate_y(-fAngle) * matrix::rotate_x(-fAngle) * matrix::rotate_z(-fAngle);
 
       void *pixels;
       int pitch;
@@ -211,6 +225,7 @@ int main() {
       //fps::rendering::draw_triangle(screen, p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], RED, RED, RED, true);
       //fps::rendering::draw_triangle(screen, p4[0], p4[1], p5[0], p5[1], p6[0], p6[1], BLUE, BLUE, BLUE, true);
       renderer.render_model(0, instances); 
+      renderer.render_model(1, instances2); 
       auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start);
       avg_time += dur.count();
       if (avg_time > 0)

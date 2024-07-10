@@ -1,3 +1,6 @@
+#ifndef FPS_CAMERA_H
+#define FPS_CAMERA_H
+
 #include <math/matrix.h>
 #include <math/vector.h>
 
@@ -119,3 +122,5 @@ namespace fps::rendering {
 
    using fps_camera = basic_fps_camera<float>;
 }
+
+#endif

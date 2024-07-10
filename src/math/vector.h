@@ -181,6 +181,18 @@ namespace fps::math {
          }
          return true;
       }
+      __attribute__((always_inline))
+      constexpr bool operator<(Derived const& rhs) const noexcept {
+         for (std::size_t i = 0; i < N; ++i) {
+            if (data_[i] < rhs.data_[i]) {
+               return true;
+            }
+            if (data_[i] > rhs.data_[i]) {
+               return false;
+            }
+         }
+         return false;
+      }
 
       __attribute__((always_inline))
       constexpr void clamp(NumericType min, NumericType max) noexcept {
